@@ -1,4 +1,8 @@
-export type LogType = 'feeding' | 'diaper' | 'sleep' | 'temperature';
+export type LogType = 'feeding' | 'formula' | 'breastfeeding' | 'diaper' | 'sleep' | 'bath' | 'medication' | 'temperature';
+
+export type DiaperType = 'pee' | 'poop' | 'both';
+
+export type CaregiverType = '엄마' | '아빠' | '할머니' | '육아도우미';
 
 export interface TimelineLog {
   id: string;
@@ -9,6 +13,7 @@ export interface TimelineLog {
   value?: string | number;
   iconBg?: string;
   badge?: string;
+  diaperType?: DiaperType;
 }
 
 export interface DiaperInventory {
@@ -20,14 +25,13 @@ export interface DiaperInventory {
 
 export interface FormulaInventory {
   brandName: string;
-  currentCount: number; // e.g. 2 cans left
-  maxCount: number; // 8 cans box
+  currentCount: number;
+  maxCount: number;
   couponClaimed: boolean;
 }
 
 export interface CoParentingStatus {
-  activeParent: '엄마' | '아빠';
-  partnerName: '아빠' | '엄마';
+  activeParent: CaregiverType;
   elapsedText: string;
   lastFeedingTime: string;
 }
@@ -35,8 +39,17 @@ export interface CoParentingStatus {
 export interface TemperatureState {
   currentTemp: number;
   isHighFever: boolean; // >= 38.0
-  antipyreticTimer: number; // in seconds (e.g. 4 hours left)
+  antipyreticTimer: number; // in seconds
   antipyreticGivenAt?: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  type: 'fever' | 'inventory' | 'vaccine' | 'baton';
+  title: string;
+  message: string;
+  time: string;
+  isRead: boolean;
 }
 
 export interface PhotoDiaryItem {
@@ -45,6 +58,7 @@ export interface PhotoDiaryItem {
   date: string;
   imageUrl: string;
   moodEmoji: string;
+  title: string;
   content: string;
   likesCount: number;
   isLiked?: boolean;

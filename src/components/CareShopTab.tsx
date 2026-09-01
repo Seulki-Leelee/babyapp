@@ -1,14 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Sparkles,
   QrCode,
   ShieldAlert,
   ShoppingBag,
-  Heart,
-  ChevronRight,
-  Gift,
-  Award,
-  Zap
+  Syringe,
+  BellRing,
+  CheckCircle2,
+  ChevronRight
 } from 'lucide-react';
 import type { TemperatureState } from '../types';
 
@@ -25,79 +24,51 @@ export const CareShopTab: React.FC<CareShopTabProps> = ({
   onOpenBarcodeModal,
   onSelectProduct,
 }) => {
+  const [alarm1Set, setAlarm1Set] = useState(true);
+
   return (
     <div className="space-y-4 pb-20">
-      {/* 1. Temperature-tailored Emergency Care Banner (Appears when temp >= 38.0°C) */}
-      {tempState.isHighFever ? (
-        <div className="bg-gradient-to-br from-red-500 via-rose-500 to-coral-600 rounded-2xl p-4 text-white shadow-float animate-pulse-border">
-          <div className="flex items-center justify-between mb-2">
-            <span className="bg-white text-red-600 text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-              🚨 체온 연동 긴급 큐레이션 ({tempState.currentTemp}°C)
-            </span>
-            <span className="text-[11px] font-bold bg-black/20 px-2 py-0.5 rounded-lg">
-              15% 즉시할인
-            </span>
-          </div>
-
-          <h3 className="font-extrabold text-base leading-snug">
-            접종열 & 고열 진정 긴급 케어 세트
-          </h3>
-          <p className="text-xs text-red-100 mt-1">
-            소아과 전문의 자문: 쿨링 패치 부착 + 수딩밤 열감 보습케어 키트
-          </p>
-
-          <div className="mt-3 bg-white/10 backdrop-blur-md rounded-xl p-3 flex items-center justify-between border border-white/20">
-            <div className="flex items-center gap-3">
-              <img
-                src="https://images.unsplash.com/photo-1608248597260-9994c653229b?auto=format&fit=crop&w=300&q=80"
-                alt="쿨링패치"
-                className="w-12 h-12 rounded-lg object-cover border border-white/40 shadow-sm"
-              />
-              <div>
-                <h4 className="font-bold text-xs">열감 진정 쿨링패치(10매) + 하이드로 수딩밤</h4>
-                <p className="text-[11px] text-red-100 line-through">28,000원</p>
-                <p className="text-sm font-extrabold text-white">23,800원 (최저가 혜택)</p>
-              </div>
-            </div>
-            <button
-              onClick={() => onSelectProduct('열감 진정 쿨링패치 + 수딩밤 세트')}
-              className="px-3 py-2 rounded-xl bg-white text-red-600 font-extrabold text-xs shadow-md hover:bg-red-50 shrink-0"
-            >
-              긴급 구매
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-base">
-              💚
+      {/* 1. [기저귀 패키지 바코드 정품 등록] 배너 (통일된 디자인 규격) */}
+      <div className="bg-white rounded-2xl p-4 border border-amber-200 shadow-soft relative overflow-hidden">
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold shrink-0">
+              <QrCode className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
-                정상 체온 수호 케어
+              <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
+                D2C CRM 정품 리필 +1,000P
               </span>
-              <h4 className="font-extrabold text-xs text-emerald-950 mt-1">
-                현재 체온 36.5°C 아주 건강해요!
-              </h4>
+              <h3 className="font-extrabold text-sm text-gray-900 mt-0.5">
+                기저귀 패키지 바코드 정품 등록
+              </h3>
             </div>
           </div>
-          <span className="text-xs text-emerald-600 font-bold">건강 모니터링 중</span>
         </div>
-      )}
 
-      {/* 2. AI Photo Diagnosis Banner */}
-      <div className="bg-white rounded-2xl p-4 border border-cream-200 shadow-soft relative overflow-hidden">
-        <div className="absolute -top-4 -right-4 w-24 h-24 bg-indigo-50 rounded-full blur-xl pointer-events-none"></div>
+        <p className="text-xs text-gray-600 leading-relaxed mt-1">
+          기저귀 패키지의 바코드를 스캔하면 정품 인증 포인트가 적립되고 홈 화면의 잔여 기저귀 60매가 자동 리필됩니다.
+        </p>
 
-        <div className="flex items-start justify-between">
+        <button
+          onClick={onOpenBarcodeModal}
+          className="w-full mt-3 py-2.5 rounded-xl bg-amber-500 text-white font-extrabold text-xs shadow-md hover:bg-amber-600 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+        >
+          <QrCode className="w-4 h-4" />
+          바코드 스캔으로 기저귀 리필하기
+        </button>
+      </div>
+
+      {/* 2. [AI 아기 대변 & 피부 사진 진단] 배너 (통일된 디자인 규격) */}
+      <div className="bg-white rounded-2xl p-4 border border-indigo-200 shadow-soft relative overflow-hidden">
+        <div className="flex items-start justify-between mb-2">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
-                AI 헬스케어 솔루션
+              <span className="text-[10px] font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">
+                AI 헬스케어 진단 솔루션
               </span>
               <h3 className="font-extrabold text-sm text-gray-900 mt-0.5">
                 AI 아기 대변 & 피부 사진 진단
@@ -106,120 +77,167 @@ export const CareShopTab: React.FC<CareShopTabProps> = ({
           </div>
         </div>
 
-        <p className="text-xs text-gray-600 mt-2.5 leading-relaxed">
-          대변/피부 사진 업로드 시 소아과 데이터를 기반으로 황금변 장 건강 상태와 피부 민감도를 즉시 분석하고 맞춤 유산균/케어 상품을 큐레이션합니다.
+        <p className="text-xs text-gray-600 leading-relaxed mt-1">
+          대변/피부 사진 업로드 시 소아과 빅데이터를 기반으로 장 건강 상태와 피부 민감도를 즉시 분석하고 맞춤 솔루션을 안내합니다.
         </p>
 
         <button
           onClick={onOpenAiScan}
-          className="w-full mt-3 py-3 rounded-xl bg-indigo-600 text-white font-bold text-xs shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+          className="w-full mt-3 py-2.5 rounded-xl bg-indigo-600 text-white font-extrabold text-xs shadow-md hover:bg-indigo-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
         >
           <Sparkles className="w-4 h-4" />
-          대변/피부 사진 업로드 시뮬레이션 시작
+          대변/피부 사진 업로드 진단 시작
         </button>
       </div>
 
-      {/* 3. Diaper Barcode Registration Popup Banner */}
-      <div className="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-4 text-white shadow-soft flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center shrink-0">
-            <QrCode className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="bg-white text-amber-600 text-[10px] font-black px-2 py-0.2 rounded-full uppercase">
-                D2C CRM 포인트
-              </span>
-              <span className="text-[11px] text-amber-100">+1,000P 적립</span>
+      {/* 3. [예방 접종 & 검진 D-day 알림] 배너 (통일된 디자인 규격) */}
+      <div className="bg-white rounded-2xl p-4 border border-cream-200 shadow-soft space-y-3">
+        <div className="flex items-start justify-between mb-1">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-xl bg-coral-100 text-coral-600 flex items-center justify-center font-bold shrink-0">
+              <Syringe className="w-5 h-5" />
             </div>
-            <h4 className="font-extrabold text-sm text-white mt-0.5">
-              기저귀 패키지 바코드 정품 등록
-            </h4>
-            <p className="text-[11px] text-amber-100">
-              스캔 즉시 홈 잔여 기저귀 60매 자동 리필
-            </p>
+            <div>
+              <span className="text-[10px] font-extrabold text-coral-600 bg-coral-50 px-2 py-0.5 rounded-full border border-coral-200">
+                생후 4개월 예방접종 일정
+              </span>
+              <h3 className="font-extrabold text-sm text-gray-900 mt-0.5">
+                예방 접종 & 검진 D-day 알림
+              </h3>
+            </div>
           </div>
         </div>
 
-        <button
-          onClick={onOpenBarcodeModal}
-          className="px-3.5 py-2 rounded-xl bg-white text-amber-600 font-extrabold text-xs shadow-md hover:bg-amber-50 active:scale-95 shrink-0"
-        >
-          바코드 스캔
-        </button>
-      </div>
+        {/* 2 Rows */}
+        <div className="space-y-2 pt-1">
+          <div className="p-2.5 rounded-xl bg-cream-50 border border-cream-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="bg-coral-500 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shrink-0">
+                D-3
+              </span>
+              <div>
+                <h5 className="font-bold text-xs text-gray-900">폐구균 2차 예방접종 예정</h5>
+                <p className="text-[10px] text-gray-500">2026.09.04 예정 (생후 4개월 권장)</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setAlarm1Set(!alarm1Set)}
+              className={`px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all ${
+                alarm1Set
+                  ? 'bg-coral-100 text-coral-600 border border-coral-200'
+                  : 'bg-gray-100 text-gray-400'
+              }`}
+            >
+              <BellRing className="w-3 h-3" />
+              {alarm1Set ? '알림 켜짐' : '알림 꺼짐'}
+            </button>
+          </div>
 
-      {/* 4. Age-Tailored D2C Commerce Curation Cards */}
-      <div className="bg-white rounded-2xl p-4 border border-cream-200 shadow-soft">
-        <div className="flex items-center justify-between mb-3 border-b border-gray-100 pb-2">
-          <div>
-            <span className="text-[10px] font-bold text-coral-500 uppercase tracking-wide">
-              라이프사이클 맞춤 추천
+          <div className="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-200 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="bg-emerald-600 text-white text-[10px] font-black px-2 py-0.5 rounded-lg shrink-0">
+                완료
+              </span>
+              <div>
+                <h5 className="font-bold text-xs text-gray-900">dtap & 폴리오 1차 접종 완료</h5>
+                <p className="text-[10px] text-emerald-700">생후 2개월 연령 권장 접종 완료됨</p>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" /> 접종 완료
             </span>
-            <h4 className="font-extrabold text-sm text-gray-900">
-              생후 4개월 (120일) 추천 기획전
-            </h4>
           </div>
-          <span className="text-[11px] text-coral-500 font-bold flex items-center gap-0.5">
-            전체보기 <ChevronRight className="w-3.5 h-3.5" />
-          </span>
+        </div>
+      </div>
+
+      {/* 4. 제일 아래: [광고들] */}
+      <div className="space-y-3">
+        {/* Compact Emergency Care Banner */}
+        <div className="bg-gradient-to-r from-red-500 to-rose-600 rounded-xl p-3 text-white shadow-sm flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <span className="bg-white text-red-600 text-[9px] font-extrabold px-2 py-0.2 rounded-full">
+                🚨 체온 연동 케어
+              </span>
+              <h4 className="font-bold text-xs text-white mt-0.5">
+                접종열 & 고열 진정 긴급 케어 세트 (15% 할인)
+              </h4>
+            </div>
+          </div>
+          <button
+            onClick={() => onSelectProduct('접종열 & 고열 진정 케어 세트')}
+            className="px-3 py-1.5 rounded-lg bg-white text-red-600 font-extrabold text-[11px] shadow-2xs hover:bg-red-50 shrink-0"
+          >
+            보기 ➔
+          </button>
         </div>
 
-        <div className="space-y-3">
-          {/* Card 1: Probiotics */}
-          <div className="flex gap-3 items-center p-2.5 rounded-xl border border-gray-100 hover:border-coral-200 transition-colors">
-            <img
-              src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=200&q=80"
-              alt="황금변 유산균"
-              className="w-16 h-16 rounded-xl object-cover border border-gray-200 shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.2 rounded">
-                AI 추천 1위
-              </span>
-              <h5 className="font-bold text-xs text-gray-900 truncate mt-0.5">
-                황금변 유지 덴마크 100억 생유산균 (30일분)
-              </h5>
-              <p className="text-[11px] text-gray-400">장 건강 밸런스 유지 / 분유 유산균</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xs font-extrabold text-coral-500">24,000원</span>
-                <span className="text-[10px] text-gray-400 line-through">48,000원 (1+1)</span>
-              </div>
-            </div>
-            <button
-              onClick={() => onSelectProduct('황금변 유지 생유산균')}
-              className="p-2 rounded-lg bg-coral-50 text-coral-600 font-bold text-xs hover:bg-coral-100 shrink-0"
-            >
-              <ShoppingBag className="w-4 h-4" />
-            </button>
+        {/* Compact Product Ads (Diaper & Wipes) */}
+        <div className="bg-white rounded-2xl p-3.5 border border-cream-200 shadow-soft">
+          <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-100">
+            <h4 className="font-extrabold text-xs text-gray-900">
+              콩심이네 추천 필수용품 리필
+            </h4>
+            <span className="text-[10px] text-coral-500 font-bold">자사몰 혜택</span>
           </div>
 
-          {/* Card 2: Soft Diaper Refill */}
-          <div className="flex gap-3 items-center p-2.5 rounded-xl border border-gray-100 hover:border-coral-200 transition-colors">
-            <img
-              src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=200&q=80"
-              alt="기저귀"
-              className="w-16 h-16 rounded-xl object-cover border border-gray-200 shrink-0"
-            />
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-1.5 py-0.2 rounded">
-                정기구독 10%
-              </span>
-              <h5 className="font-bold text-xs text-gray-900 truncate mt-0.5">
-                순둥이 보송기저귀 2단계 밴드형 (60매x3팩)
-              </h5>
-              <p className="text-[11px] text-gray-400">자연 유래 흡수체 / 발진 제로</p>
-              <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-xs font-extrabold text-coral-500">38,500원</span>
-                <span className="text-[10px] text-gray-400 line-through">45,000원</span>
+          <div className="space-y-2.5">
+            {/* Product 1: 2025 하기스 네이처메이드 3단계 공용 150매 (밴드형) X 2 (총 300매) */}
+            <div className="flex gap-3 items-center p-2 rounded-xl border border-gray-100 hover:border-amber-200 transition-colors bg-amber-50/30">
+              <img
+                src="https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=200&q=80"
+                alt="기저귀 300매"
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-[9px] font-extrabold text-amber-700 bg-amber-100 px-1.5 py-0.2 rounded">
+                  기저귀 특가
+                </span>
+                <h5 className="font-bold text-xs text-gray-900 truncate mt-0.5">
+                  2025 하기스 네이처메이드 3단계 공용 150매 (밴드형) X 2 (총 300매)
+                </h5>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-xs font-black text-coral-500">89,000원</span>
+                  <span className="text-[10px] text-gray-400 line-through">105,000원</span>
+                </div>
               </div>
+              <button
+                onClick={() => onSelectProduct('2025 하기스 네이처메이드 3단계 300매')}
+                className="p-2 rounded-lg bg-coral-50 text-coral-600 font-bold text-xs hover:bg-coral-100 shrink-0"
+              >
+                <ShoppingBag className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => onSelectProduct('순둥이 보송기저귀 2단계 3팩')}
-              className="p-2 rounded-lg bg-coral-50 text-coral-600 font-bold text-xs hover:bg-coral-100 shrink-0"
-            >
-              <ShoppingBag className="w-4 h-4" />
-            </button>
+
+            {/* Product 2: NEW 하기스 내츄럴케어플러스 물티슈 72매*10입 */}
+            <div className="flex gap-3 items-center p-2 rounded-xl border border-gray-100 hover:border-emerald-200 transition-colors bg-emerald-50/30">
+              <img
+                src="https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?auto=format&fit=crop&w=200&q=80"
+                alt="물티슈 10입"
+                className="w-12 h-12 rounded-lg object-cover border border-gray-200 shrink-0"
+              />
+              <div className="flex-1 min-w-0">
+                <span className="text-[9px] font-extrabold text-emerald-700 bg-emerald-100 px-1.5 py-0.2 rounded">
+                  물티슈 신상품
+                </span>
+                <h5 className="font-bold text-xs text-gray-900 truncate mt-0.5">
+                  NEW 하기스 내츄럴케어플러스 물티슈 72매*10입
+                </h5>
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="text-xs font-black text-coral-500">21,900원</span>
+                  <span className="text-[10px] text-gray-400 line-through">26,000원</span>
+                </div>
+              </div>
+              <button
+                onClick={() => onSelectProduct('NEW 하기스 내츄럴케어플러스 물티슈 10입')}
+                className="p-2 rounded-lg bg-coral-50 text-coral-600 font-bold text-xs hover:bg-coral-100 shrink-0"
+              >
+                <ShoppingBag className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Camera, Heart, Sparkles, Calendar, Share2, Award, ShoppingBag, Plus } from 'lucide-react';
+import { Camera, Plus, Heart, Share2, Baby, Gamepad2, Calendar as CalendarIcon, ChevronRight, X, BookOpen, ChevronLeft } from 'lucide-react';
 import type { PhotoDiaryItem } from '../types';
 
 interface DiaryTabProps {
   diaries: PhotoDiaryItem[];
   onOpenDiaryModal: () => void;
-  babyDays?: number;
+  babyDays: number;
   onToggleLike: (id: string) => void;
   onSelectProduct: (productName: string) => void;
 }
@@ -13,147 +13,468 @@ interface DiaryTabProps {
 export const DiaryTab: React.FC<DiaryTabProps> = ({
   diaries,
   onOpenDiaryModal,
-  babyDays = 120,
+  babyDays,
   onToggleLike,
   onSelectProduct,
 }) => {
+  // Base selected date (Default to 2026-09-01)
+  const [selectedDate, setSelectedDate] = useState<string>('2026.09.01');
+  const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+
+  // Active diary modal readers
+  const [selectedDiaryForRead, setSelectedDiaryForRead] = useState<PhotoDiaryItem | null>(null);
+  const [activeGuideModal, setActiveGuideModal] = useState<'behavior' | 'play' | null>(null);
+
+  // Generate 11-day date window (selectedDate ± 5 days)
+  const generate11DayWindow = (centerDateStr: string) => {
+    const dates: { dateStr: string; dayLabel: string; dDay: number }[] = [];
+    const parts = centerDateStr.split('.').map(Number);
+    const year = parts[0] || 2026;
+    const month = (parts[1] || 9) - 1;
+    const day = parts[2] || 1;
+
+    const base = new Date(year, month, day);
+
+    for (let offset = -5; offset <= 5; offset++) {
+      const d = new Date(base);
+      d.setDate(base.getDate() + offset);
+
+      const yyyy = d.getFullYear();
+      const mm = (d.getMonth() + 1).toString().padStart(2, '0');
+      const dd = d.getDate().toString().padStart(2, '0');
+      const formatted = `${yyyy}.${mm}.${dd}`;
+
+      // Calculate relative baby days (110 on 2026.09.01)
+      const diffDays = Math.floor((d.getTime() - new Date(2026, 8, 1).getTime()) / (1000 * 60 * 60 * 24));
+      const calculatedBabyDays = 110 + diffDays;
+
+      dates.push({
+        dateStr: formatted,
+        dayLabel: offset === 0 ? '선택일' : `${mm}.${dd}`,
+        dDay: calculatedBabyDays,
+      });
+    }
+
+    return dates;
+  };
+
+  const dateWindow = generate11DayWindow(selectedDate);
+
+  // Find diary for currently selected date or closest diary
+  const matchedDiary = diaries.find((d) => d.date === selectedDate) || diaries[0];
+
   return (
     <div className="space-y-4 pb-20">
-      {/* 1. Header Banner */}
-      <div className="bg-gradient-to-r from-coral-500 via-rose-400 to-amber-400 rounded-2xl p-5 text-white shadow-float relative overflow-hidden">
-        <div className="flex justify-between items-start relative z-10">
-          <div>
-            <span className="bg-white/20 backdrop-blur-md text-white text-[11px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
-              성장 모먼트 앨범
-            </span>
-            <h2 className="font-black text-2xl text-white mt-2 tracking-tight">
-              우리 아기 +{babyDays}일째 👶
-            </h2>
-            <p className="text-xs text-white/90 mt-1">
-              매일의 반짝이는 육아 기억을 감성 폴라로이드로 소장하세요.
-            </p>
-          </div>
-          <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl border border-white/30">
+      {/* 1. Compact Header Banner */}
+      <div className="bg-gradient-to-r from-coral-500 via-rose-500 to-amber-500 rounded-2xl p-3.5 text-white shadow-soft flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-base border border-white/30 shrink-0">
             📸
+          </div>
+          <div>
+            <div className="flex items-center gap-1.5">
+              <h2 className="font-extrabold text-sm text-white tracking-tight">
+                콩심이 포토일기 (+{babyDays}일)
+              </h2>
+            </div>
+            <p className="text-[10px] text-white/90">달력으로 과거 일기를 자유롭게 찾아보세요</p>
           </div>
         </div>
 
-        {/* Action Button */}
         <button
           onClick={onOpenDiaryModal}
-          className="w-full mt-4 py-3 rounded-xl bg-white text-coral-600 font-extrabold text-sm shadow-md hover:bg-cream-50 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+          className="px-3 py-2 rounded-xl bg-white text-coral-600 font-extrabold text-xs shadow-md hover:bg-cream-50 active:scale-95 transition-all flex items-center gap-1 shrink-0"
         >
-          <Plus className="w-4 h-4 stroke-[3]" />
-          오늘의 사진과 일기 작성하기
+          <Plus className="w-3.5 h-3.5 stroke-[3]" />
+          일기 쓰기
         </button>
       </div>
 
-      {/* 2. Polaroid Style Feed List */}
-      <div className="space-y-5">
-        {diaries.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-3xl p-4 border border-cream-200 shadow-soft space-y-3 transition-transform animate-scale-pop"
+      {/* 2. Interactive Calendar Date Selector (달력 팝업 연동 & 앞뒤 5일 슬라이더) */}
+      <div className="bg-white rounded-2xl p-3 border border-cream-200 shadow-soft space-y-2.5">
+        <div className="flex items-center justify-between px-1">
+          <div className="flex items-center gap-1.5">
+            <CalendarIcon className="w-4 h-4 text-coral-500" />
+            <span className="text-xs font-black text-gray-900">
+              {selectedDate} (앞뒤 5일 탐색)
+            </span>
+          </div>
+
+          <button
+            onClick={() => setIsCalendarModalOpen(true)}
+            className="px-2.5 py-1 rounded-xl bg-coral-50 text-coral-600 font-extrabold text-[11px] border border-coral-200 hover:bg-coral-100 flex items-center gap-1 shadow-2xs active:scale-95 transition-transform"
           >
-            {/* Top Info */}
+            <CalendarIcon className="w-3 h-3" />
+            전체 달력 팝업 ➔
+          </button>
+        </div>
+
+        {/* 11-Day Window Date Bar (±5 days around selected date) */}
+        <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
+          {dateWindow.map((item) => (
+            <button
+              key={item.dateStr}
+              onClick={() => setSelectedDate(item.dateStr)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold shrink-0 border transition-all ${
+                selectedDate === item.dateStr
+                  ? 'bg-coral-500 text-white border-coral-500 shadow-sm scale-105'
+                  : 'bg-cream-50 text-gray-700 border-cream-200 hover:bg-cream-100'
+              }`}
+            >
+              <div>{item.dateStr.slice(5)}</div>
+              <div className="text-[9px] opacity-80">D+{item.dDay}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Photo Diary Card Display for Selected Date */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-xs font-black text-gray-800 flex items-center gap-1">
+            <BookOpen className="w-4 h-4 text-coral-500" />
+            선택한 날짜의 포토일기
+          </span>
+          <span className="text-[10px] text-gray-400 font-bold">
+            {selectedDate} 기록
+          </span>
+        </div>
+
+        {matchedDiary ? (
+          <div
+            onClick={() => setSelectedDiaryForRead(matchedDiary)}
+            className="bg-white rounded-3xl p-4 border border-coral-300 ring-2 ring-coral-100 shadow-soft space-y-3 cursor-pointer group hover:border-coral-400 transition-all"
+          >
+            {/* Top Title */}
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="text-xl">{item.moodEmoji}</span>
+                <span className="text-2xl">{matchedDiary.moodEmoji}</span>
                 <div>
-                  <h4 className="font-extrabold text-xs text-gray-900">
-                    김로아 (D+{item.babyDays})
+                  <h4 className="font-extrabold text-sm text-gray-900 group-hover:text-coral-600 transition-colors">
+                    {matchedDiary.title || '콩심이의 성장 이야기'}
                   </h4>
                   <span className="text-[10px] text-gray-400 font-medium">
-                    {item.date}
+                    {matchedDiary.date} (D+{matchedDiary.babyDays}) 작성
                   </span>
                 </div>
               </div>
               <span className="bg-coral-50 text-coral-600 text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-coral-100">
-                ⭐ 뒤집기 성공 매직 모먼트
+                ⭐ 성장 매직 모먼트
               </span>
             </div>
 
-            {/* Polaroid Frame */}
-            <div className="bg-cream-50 rounded-2xl p-3 border border-cream-200 shadow-inner space-y-3">
-              <div className="relative rounded-xl overflow-hidden aspect-square border border-gray-200/60 shadow-sm bg-gray-100">
+            {/* Photo Thumbnail + Preview */}
+            <div className="bg-cream-50 rounded-2xl p-3 border border-cream-200 flex items-center gap-3">
+              <div className="relative rounded-xl overflow-hidden w-20 h-20 border border-cream-300 shadow-2xs bg-white shrink-0 flex items-center justify-center p-0.5">
                 <img
-                  src={item.imageUrl}
+                  src={matchedDiary.imageUrl}
                   alt="육아 일기 사진"
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover rounded-lg"
                 />
-                <div className="absolute top-3 right-3 bg-black/40 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-full">
-                  D+{item.babyDays}일
-                </div>
               </div>
-
-              {/* Diary Text */}
-              <div className="px-1 py-1">
-                <p className="font-extrabold text-sm text-gray-800 leading-relaxed font-sans">
-                  "{item.content}"
+              <div className="flex-1 min-w-0">
+                <span className="text-[10px] font-bold text-coral-500 bg-coral-50 px-2 py-0.5 rounded-full border border-coral-100">
+                  D+{matchedDiary.babyDays}일 사진
+                </span>
+                <h5 className="font-extrabold text-xs text-gray-900 mt-1 line-clamp-1">
+                  "{matchedDiary.title || matchedDiary.content.substring(0, 15)}"
+                </h5>
+                <p className="text-[11px] text-coral-600 font-bold mt-1 flex items-center gap-0.5">
+                  📖 긴 일기 전체보기 ➔
                 </p>
               </div>
             </div>
 
-            {/* Bottom Interactions */}
+            {/* Bottom Actions */}
             <div className="flex items-center justify-between pt-1">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => onToggleLike(item.id)}
-                  className={`flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full border transition-all ${
-                    item.isLiked
-                      ? 'bg-rose-50 text-rose-600 border-rose-200'
-                      : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleLike(matchedDiary.id);
+                }}
+                className={`flex items-center gap-1 text-xs font-bold px-3 py-1.5 rounded-full border transition-all ${
+                  matchedDiary.isLiked
+                    ? 'bg-rose-50 text-rose-600 border-rose-200'
+                    : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                <Heart
+                  className={`w-4 h-4 ${
+                    matchedDiary.isLiked ? 'fill-rose-500 text-rose-500' : 'text-gray-400'
                   }`}
-                >
-                  <Heart
-                    className={`w-4 h-4 ${
-                      item.isLiked ? 'fill-rose-500 text-rose-500' : 'text-gray-400'
-                    }`}
-                  />
-                  {item.likesCount}
-                </button>
-                <button className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-gray-800">
-                  <Share2 className="w-3.5 h-3.5" />
-                  공유하기
-                </button>
-              </div>
+                />
+                {matchedDiary.likesCount}
+              </button>
 
-              <span className="text-[11px] text-coral-500 font-bold bg-coral-50 px-2.5 py-1 rounded-full">
-                💌 칭찬 스티커 획득
+              <span className="text-[11px] text-gray-500 font-bold bg-cream-100 px-3 py-1 rounded-full">
+                터치하여 긴 내용 읽기 ➔
               </span>
             </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-3xl p-6 border border-cream-200 shadow-soft text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-cream-100 text-coral-500 flex items-center justify-center mx-auto text-2xl">
+              ✏️
+            </div>
+            <h4 className="font-extrabold text-sm text-gray-900">
+              {selectedDate} 일기가 아직 작성되지 않았습니다.
+            </h4>
+            <p className="text-xs text-gray-500">
+              이 날의 소중한 순간과 추억을 포토 일기로 기록해 보세요!
+            </p>
+            <button
+              onClick={onOpenDiaryModal}
+              className="px-4 py-2.5 rounded-xl bg-coral-500 text-white font-extrabold text-xs shadow-md hover:bg-coral-600"
+            >
+              + 이 날짜에 일기 쓰기
+            </button>
+          </div>
+        )}
+      </div>
 
-            {/* D2C Keepsake Product Curation Banner */}
-            {item.crmProduct && (
-              <div className="mt-2 bg-gradient-to-r from-amber-50 to-cream-100 rounded-2xl p-3 border border-amber-200 flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-xl bg-amber-500 text-white flex items-center justify-center text-xs font-bold shrink-0">
-                    🎁
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold text-amber-700">
-                      {item.crmProduct.title}
-                    </span>
-                    <h5 className="font-bold text-xs text-gray-900">
-                      {item.crmProduct.productName}
-                    </h5>
-                    <p className="text-[10px] text-coral-600 font-extrabold">
-                      {item.crmProduct.discountText} ({item.crmProduct.price})
-                    </p>
-                  </div>
+      {/* 4. Bottom Milestone Guide */}
+      <div className="bg-gradient-to-br from-indigo-50 via-cream-100 to-amber-50 rounded-3xl p-4 border border-indigo-200/80 shadow-soft space-y-3">
+        <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
+          <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
+            💡
+          </div>
+          <div>
+            <h4 className="font-extrabold text-xs text-gray-900">
+              생후 110일 콩심이 발달 & 추천 놀이 (클릭 시 상세)
+            </h4>
+          </div>
+        </div>
+
+        {/* Behavior Card */}
+        <div
+          onClick={() => setActiveGuideModal('behavior')}
+          className="bg-white/90 p-3 rounded-xl border border-indigo-200 flex items-start gap-2 text-xs cursor-pointer hover:bg-indigo-50/60 transition-colors"
+        >
+          <span className="text-base shrink-0">🔄</span>
+          <div className="flex-1 min-w-0">
+            <strong className="text-gray-900 font-extrabold flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <Baby className="w-3.5 h-3.5 text-indigo-600" /> 110일 발달 행동: 뒤집기 시도
+              </span>
+              <span className="text-[10px] text-indigo-600 font-bold">자세히 ➔</span>
+            </strong>
+            <p className="text-[11px] text-gray-600 mt-0.5 leading-snug">
+              목과 어깨 힘이 세져 엎드렸을 때 고개를 90도로 높이 들고 뒤집기를 맹연습합니다.
+            </p>
+          </div>
+        </div>
+
+        {/* Play Card */}
+        <div
+          onClick={() => setActiveGuideModal('play')}
+          className="bg-amber-50/90 p-3 rounded-xl border border-amber-200 flex items-start gap-2 text-xs cursor-pointer hover:bg-amber-100/60 transition-colors"
+        >
+          <span className="text-base shrink-0">🪞</span>
+          <div className="flex-1 min-w-0">
+            <strong className="text-amber-950 font-extrabold flex items-center justify-between">
+              <span className="flex items-center gap-1">
+                <Gamepad2 className="w-3.5 h-3.5 text-amber-600" /> 추천 놀이: 터미타임 거울 놀이
+              </span>
+              <span className="text-[10px] text-amber-700 font-bold">자세히 ➔</span>
+            </strong>
+            <p className="text-[11px] text-amber-900/90 mt-0.5 leading-snug">
+              엎드려 있을 때 거울을 보여주면 자기 얼굴을 보며 목과 상체 근육이 쑥쑥 발달합니다.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* FULL CALENDAR PICKER MODAL (달력 전체 팝업 모달) */}
+      {isCalendarModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
+          <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up space-y-4">
+            <div className="flex items-center justify-between border-b border-cream-200 pb-3">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-xl bg-coral-100 text-coral-600 flex items-center justify-center font-bold">
+                  <CalendarIcon className="w-5 h-5" />
                 </div>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">육아일기 전체 달력 탐색</h3>
+                  <p className="text-xs text-gray-500">과거 어느 날짜든 자유롭게 선택하세요</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsCalendarModalOpen(false)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
-                <button
-                  onClick={() => onSelectProduct(item.crmProduct!.productName)}
-                  className="px-2.5 py-1.5 rounded-lg bg-coral-500 text-white font-extrabold text-[11px] shadow-sm hover:bg-coral-600 shrink-0"
-                >
-                  액자 제작
-                </button>
+            {/* Calendar Grid (2026.08 & 2026.09) */}
+            <div className="space-y-3">
+              <div className="text-xs font-black text-gray-800 text-center bg-cream-100 py-1.5 rounded-xl border border-cream-200">
+                📅 2026년 8월 ~ 9월 선택
+              </div>
+
+              <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-bold text-gray-400 py-1">
+                <span className="text-red-500">일</span>
+                <span>월</span>
+                <span>화</span>
+                <span>수</span>
+                <span>목</span>
+                <span>금</span>
+                <span className="text-blue-500">토</span>
+              </div>
+
+              {/* Sample Dates 2026.08.15 ~ 2026.09.05 */}
+              <div className="grid grid-cols-7 gap-1.5 text-center">
+                {['2026.08.15', '2026.08.16', '2026.08.17', '2026.08.18', '2026.08.19', '2026.08.20', '2026.08.21', '2026.08.22', '2026.08.23', '2026.08.24', '2026.08.25', '2026.08.26', '2026.08.27', '2026.08.28', '2026.08.29', '2026.08.30', '2026.08.31', '2026.09.01', '2026.09.02', '2026.09.03', '2026.09.04'].map((dStr) => {
+                  const dayNum = parseInt(dStr.slice(8));
+                  const isSelected = selectedDate === dStr;
+                  const hasDiary = diaries.some((di) => di.date === dStr);
+
+                  return (
+                    <button
+                      key={dStr}
+                      onClick={() => {
+                        setSelectedDate(dStr);
+                        setIsCalendarModalOpen(false);
+                      }}
+                      className={`p-2.5 rounded-xl text-xs font-black transition-all relative ${
+                        isSelected
+                          ? 'bg-coral-500 text-white shadow-md scale-105'
+                          : hasDiary
+                          ? 'bg-cream-100 text-gray-900 border border-coral-300'
+                          : 'bg-gray-50 text-gray-600 hover:bg-cream-50'
+                      }`}
+                    >
+                      <span>{dayNum}</span>
+                      {hasDiary && (
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-coral-500 rounded-full"></span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsCalendarModalOpen(false)}
+              className="w-full py-3 rounded-2xl bg-gray-900 text-white font-extrabold text-sm hover:bg-gray-800"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* FULL LONG TEXT READER MODAL */}
+      {selectedDiaryForRead && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
+          <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up max-h-[85vh] overflow-y-auto space-y-4">
+            <div className="flex items-center justify-between border-b border-cream-200 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{selectedDiaryForRead.moodEmoji}</span>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">
+                    {selectedDiaryForRead.title || '콩심이 포토 일기'}
+                  </h3>
+                  <span className="text-xs text-gray-400">
+                    {selectedDiaryForRead.date} (D+{selectedDiaryForRead.babyDays}) 작성
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setSelectedDiaryForRead(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Photo inside Modal */}
+            <div className="relative rounded-2xl overflow-hidden h-48 border border-cream-200 bg-cream-50 flex items-center justify-center p-1 shadow-inner">
+              <img
+                src={selectedDiaryForRead.imageUrl}
+                alt="일기 사진"
+                className="max-h-full max-w-full object-contain rounded-xl"
+              />
+            </div>
+
+            {/* Title Section */}
+            <div className="bg-coral-50 p-3 rounded-xl border border-coral-200">
+              <span className="text-[10px] font-bold text-coral-600 uppercase">일기 제목</span>
+              <h4 className="font-extrabold text-sm text-gray-900 mt-0.5">
+                "{selectedDiaryForRead.title || '오늘 처음으로 뒤집기 성공!'}"
+              </h4>
+            </div>
+
+            {/* Full Long Text Paragraph Section */}
+            <div className="bg-cream-50/80 p-4 rounded-2xl border border-cream-200">
+              <span className="text-[10px] font-bold text-gray-400 uppercase">일기 본문 내용</span>
+              <p className="font-extrabold text-xs text-gray-900 leading-relaxed font-sans whitespace-pre-line mt-1">
+                {selectedDiaryForRead.content}
+              </p>
+            </div>
+
+            <button
+              onClick={() => setSelectedDiaryForRead(null)}
+              className="w-full py-3 rounded-2xl bg-coral-500 text-white font-extrabold text-sm hover:bg-coral-600"
+            >
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* DETAILED GUIDANCE MODAL */}
+      {activeGuideModal && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
+          <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up space-y-4">
+            <div className="flex items-center justify-between border-b border-cream-200 pb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">{activeGuideModal === 'behavior' ? '🔄' : '🪞'}</span>
+                <div>
+                  <h3 className="font-black text-base text-gray-900">
+                    {activeGuideModal === 'behavior' ? '110일 발달 행동 상세 케어' : '터미타임 거울 놀이 상세 가이드'}
+                  </h3>
+                  <span className="text-xs text-gray-400">소아과 전문의 추천 발달 팁</span>
+                </div>
+              </div>
+              <button
+                onClick={() => setActiveGuideModal(null)}
+                className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 hover:bg-gray-200"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {activeGuideModal === 'behavior' ? (
+              <div className="space-y-3 text-xs text-gray-700 leading-relaxed bg-indigo-50/70 p-4 rounded-2xl border border-indigo-200">
+                <h4 className="font-extrabold text-sm text-indigo-950">🔄 뒤집기 시도 핵심 포인트</h4>
+                <ul className="list-disc pl-4 space-y-1.5 text-gray-800">
+                  <li><strong>상체 근육 강화</strong>: 110일 무렵 아기는 등과 목 근육이 발달하여 시야를 넓히기 위해 고개를 들고 뒤집기를 맹연습합니다.</li>
+                  <li><strong>낙상 안전 주의</strong>: 침대나 소파 위에서는 순식간에 뒤집어 떨어질 수 있으므로 반드시 바닥 매트 위에서 놀아주세요.</li>
+                  <li><strong>질식 방지 매트</strong>: 폭신한 이불보다는 탄탄한 놀이 매트가 호흡에 안전합니다.</li>
+                </ul>
+              </div>
+            ) : (
+              <div className="space-y-3 text-xs text-gray-700 leading-relaxed bg-amber-50/70 p-4 rounded-2xl border border-amber-200">
+                <h4 className="font-extrabold text-sm text-amber-950">🪞 터미타임 거울 놀이 가이드</h4>
+                <ul className="list-disc pl-4 space-y-1.5 text-amber-950">
+                  <li><strong>안전 아기 거울 세팅</strong>: 깨지지 않는 아크릴 안전 거울을 아기 시선에서 20~30cm 앞에 대각선으로 세워주세요.</li>
+                  <li><strong>신체 자아 인지</strong>: 거울 속에 비친 자신의 얼굴과 움직임을 관찰하며 자기 인지력이 향상됩니다.</li>
+                  <li><strong>권장 시간</strong>: 하루 2~3회, 식후 30분 뒤 3분~5분씩 즐겁게 진행해 주세요.</li>
+                </ul>
               </div>
             )}
+
+            <button
+              onClick={() => setActiveGuideModal(null)}
+              className="w-full py-3 rounded-2xl bg-gray-900 text-white font-extrabold text-sm hover:bg-gray-800"
+            >
+              확인 완료
+            </button>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

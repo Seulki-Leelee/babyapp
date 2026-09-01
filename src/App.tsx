@@ -8,6 +8,8 @@ import { BarcodeModal } from './components/BarcodeModal';
 import { AiScanModal } from './components/AiScanModal';
 import { DiaryModal } from './components/DiaryModal';
 import { InventoryModal } from './components/InventoryModal';
+import { NotificationModal } from './components/NotificationModal';
+import { LogDetailModal } from './components/LogDetailModal';
 
 import type {
   TimelineLog,
@@ -15,7 +17,9 @@ import type {
   FormulaInventory,
   CoParentingStatus,
   TemperatureState,
-  PhotoDiaryItem
+  PhotoDiaryItem,
+  CaregiverType,
+  NotificationItem
 } from './types';
 import confetti from 'canvas-confetti';
 
@@ -34,7 +38,7 @@ export const App: React.FC = () => {
 
   // 1. Diaper Inventory State (Starts low at 18)
   const [diaperInventory, setDiaperInventory] = useState<DiaperInventory>({
-    brandName: '순둥이 기저귀 2단계',
+    brandName: '하기스 네이처메이드 3단계',
     currentCount: 18,
     maxCount: 60,
     couponClaimed: false,
@@ -55,21 +59,56 @@ export const App: React.FC = () => {
     antipyreticTimer: 14400,
   });
 
-  // 4. Co-Parenting Status
+  // 4. Co-Parenting Caregiver Status
   const [coParenting, setCoParenting] = useState<CoParentingStatus>({
     activeParent: '엄마',
-    partnerName: '아빠',
     elapsedText: '마지막 수유 후 1시간 경과',
     lastFeedingTime: '10:30',
   });
 
-  // 5. Parenting Timeline Logs (4 Initial Items)
+  // 5. Mock Notifications List for Bell Icon Modal
+  const [notifications] = useState<NotificationItem[]>([
+    {
+      id: 'n1',
+      type: 'fever',
+      title: '🚨 고열 주의 알림 (38.2°C)',
+      message: '접종열 의심 체온이 감지되었습니다. 4시간 간격 해열제 투약 타이머가 작동 중입니다.',
+      time: '10분 전',
+      isRead: false,
+    },
+    {
+      id: 'n2',
+      type: 'inventory',
+      title: '⚠️ 기저귀 & 분유 소진 임박',
+      message: '기저귀 18매, 분유 2캔 남았습니다. 10% 전용 할인 쿠폰을 받아 바로 리필하세요.',
+      time: '30분 전',
+      isRead: false,
+    },
+    {
+      id: 'n3',
+      type: 'vaccine',
+      title: '💉 접종 D-3 폐구균 2차',
+      message: '폐구균 2차 예방접종 예정일 3일 전입니다. 접종 후 체온 모니터링을 준비하세요.',
+      time: '오늘 09:00',
+      isRead: true,
+    },
+    {
+      id: 'n4',
+      type: 'baton',
+      title: '👩‍🍼 공동육아 교대 알림',
+      message: '엄마 ➔ 아빠 육아 바통터치가 완료되었습니다.',
+      time: '1시간 전',
+      isRead: true,
+    },
+  ]);
+
+  // 6. Parenting Timeline Logs (4 Initial Items)
   const [logs, setLogs] = useState<TimelineLog[]>([
     {
       id: '1',
       type: 'temperature',
       time: '10:30',
-      title: '🌡️ 체온 38.2°C 측정',
+      title: '체온 38.2°C 측정',
       detail: '접종열 의심 (해열제 3.5ml 투여 완료, 4h 타이머 발동)',
       badge: '고열 경고 🚨',
       iconBg: 'bg-red-100 text-red-600',
@@ -78,7 +117,7 @@ export const App: React.FC = () => {
       id: '2',
       type: 'sleep',
       time: '10:00',
-      title: '😴 낮잠 1시간 10분',
+      title: '낮잠 1시간 10분',
       detail: '스위트드림 백색소음 입면',
       iconBg: 'bg-indigo-100 text-indigo-600',
     },
@@ -86,29 +125,31 @@ export const App: React.FC = () => {
       id: '3',
       type: 'diaper',
       time: '09:15',
-      title: '🧷 기저귀 소변 교체',
-      detail: '순둥이 2단계 교체 (잔여 18매)',
+      title: '기저귀 소변 교체',
+      detail: '하기스 3단계 소변 교체 (잔여 18매)',
+      diaperType: 'pee',
       iconBg: 'bg-amber-100 text-amber-600',
     },
     {
       id: '4',
-      type: 'feeding',
+      type: 'formula',
       time: '08:30',
-      title: '🍼 분유 수유 140ml',
+      title: '분유 수유 160ml',
       detail: '앱솔루트 명작 완분',
       iconBg: 'bg-coral-100 text-coral-600',
     },
   ]);
 
-  // 6. Photo Diary (1 Preloaded Item)
+  // 7. Photo Diary
   const [diaries, setDiaries] = useState<PhotoDiaryItem[]>([
     {
       id: 'init-1',
-      babyDays: 120,
+      babyDays: 110,
       date: '2026.09.01',
       imageUrl: '/kongsim.jpg',
       moodEmoji: '👶',
-      content: '오늘 처음으로 뒤집기 성공했어요! 👶',
+      title: '오늘 처음으로 스스로 뒤집기 성공!',
+      content: '오늘 아침 콩심이가 끙차 소리를 내며 온몸에 힘을 주더니, 드디어 혼자 힘으로 완전히 360도 뒤집기에 성공했다! 뒤집고 나서 스스로가 대견했는지 눈을 동그랗게 뜨고 환하게 웃는데 정말 감동이었다.',
       likesCount: 12,
       isLiked: true,
       crmProduct: {
@@ -127,17 +168,29 @@ export const App: React.FC = () => {
   const [isAiScanModalOpen, setIsAiScanModalOpen] = useState(false);
   const [isDiaryModalOpen, setIsDiaryModalOpen] = useState(false);
   const [isInventoryModalOpen, setIsInventoryModalOpen] = useState(false);
+  const [isNotificationModalOpen, setIsNotificationModalOpen] = useState(false);
+  const [selectedLogForEdit, setSelectedLogForEdit] = useState<TimelineLog | null>(null);
 
   // Actions
   const handleAddLog = (newLog: TimelineLog) => {
     setLogs([newLog, ...logs]);
   };
 
+  const handleUpdateLog = (updatedLog: TimelineLog) => {
+    setLogs((prev) => prev.map((l) => (l.id === updatedLog.id ? updatedLog : l)));
+    showToast('✏️ 육아 기록 정보가 수정되었습니다!');
+  };
+
+  const handleDeleteLog = (logId: string) => {
+    setLogs((prev) => prev.filter((l) => l.id !== logId));
+    showToast('🗑️ 육아 타임라인 기록이 삭제되었습니다.');
+  };
+
   const handleDecrementDiaper = () => {
     setDiaperInventory((prev) => {
       const nextCount = Math.max(0, prev.currentCount - 1);
       if (nextCount <= 15) {
-        showToast('⚠️ 기저귀 잔여량이 15매 이하입니다! 알림 배너를 클릭해 10% 쿠폰으로 리필하세요.');
+        showToast('⚠️ 기저귀 잔여량이 15매 이하입니다! 알림을 통해 쿠폰을 받아보세요.');
       }
       return { ...prev, currentCount: nextCount };
     });
@@ -148,7 +201,7 @@ export const App: React.FC = () => {
     try {
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
     } catch (e) {}
-    showToast('🎉 순둥이 기저귀 10% 리필 할인 쿠폰이 발급되었습니다!');
+    showToast('🎉 하기스 기저귀 10% 리필 할인 쿠폰이 발급되었습니다!');
   };
 
   const handleClaimFormulaCoupon = () => {
@@ -159,14 +212,20 @@ export const App: React.FC = () => {
     showToast('🎉 앱솔루트 명작 분유 15% 정기배송 전용 쿠폰이 발급되었습니다!');
   };
 
+  const CAREGIVER_CYCLE: CaregiverType[] = ['엄마', '아빠', '할머니', '육아도우미'];
+
   const handleToggleParent = () => {
-    setCoParenting((prev) => ({
-      ...prev,
-      activeParent: prev.activeParent === '엄마' ? '아빠' : '엄마',
-      partnerName: prev.activeParent === '엄마' ? '엄마' : '아빠',
-      elapsedText: '방금 육아 교대 완료됨',
-    }));
-    showToast(`👨‍👩‍👧 공동육아 바통터치! [${coParenting.activeParent === '엄마' ? '아빠' : '엄마'}]가 육아를 교대받았습니다.`);
+    setCoParenting((prev) => {
+      const currentIndex = CAREGIVER_CYCLE.indexOf(prev.activeParent);
+      const nextIndex = (currentIndex + 1) % CAREGIVER_CYCLE.length;
+      const nextCaregiver = CAREGIVER_CYCLE[nextIndex];
+      showToast(`👨‍👩‍👧 공동육아 교대 완료! [${nextCaregiver}] 육아 상태로 교체되었습니다.`);
+      return {
+        ...prev,
+        activeParent: nextCaregiver,
+        elapsedText: '방금 육아 교대 완료됨',
+      };
+    });
   };
 
   const handleSaveTemp = (temp: number) => {
@@ -234,7 +293,7 @@ export const App: React.FC = () => {
     <MobileFrame
       activeTab={activeTab}
       onChangeTab={setActiveTab}
-      feverAlertActive={tempState.isHighFever}
+      onOpenNotificationModal={() => setIsNotificationModalOpen(true)}
     >
       {/* Toast Banner Overlay */}
       {toastMessage && (
@@ -259,6 +318,7 @@ export const App: React.FC = () => {
           tempState={tempState}
           onOpenTempModal={() => setIsTempModalOpen(true)}
           onOpenInventoryModal={() => setIsInventoryModalOpen(true)}
+          onSelectLogForEdit={setSelectedLogForEdit}
         />
       )}
 
@@ -275,7 +335,7 @@ export const App: React.FC = () => {
         <DiaryTab
           diaries={diaries}
           onOpenDiaryModal={() => setIsDiaryModalOpen(true)}
-          babyDays={120}
+          babyDays={110}
           onToggleLike={handleToggleLike}
           onSelectProduct={handleSelectProduct}
         />
@@ -305,7 +365,7 @@ export const App: React.FC = () => {
         isOpen={isDiaryModalOpen}
         onClose={() => setIsDiaryModalOpen(false)}
         onAddDiary={handleAddDiary}
-        babyDays={120}
+        babyDays={110}
       />
 
       <InventoryModal
@@ -317,6 +377,22 @@ export const App: React.FC = () => {
         onClaimFormulaCoupon={handleClaimFormulaCoupon}
         onOpenBarcodeModal={() => setIsBarcodeModalOpen(true)}
         onOrderProduct={handleSelectProduct}
+      />
+
+      <NotificationModal
+        isOpen={isNotificationModalOpen}
+        onClose={() => setIsNotificationModalOpen(false)}
+        notifications={notifications}
+        onOpenTempModal={() => setIsTempModalOpen(true)}
+        onOpenInventoryModal={() => setIsInventoryModalOpen(true)}
+      />
+
+      <LogDetailModal
+        log={selectedLogForEdit}
+        isOpen={!!selectedLogForEdit}
+        onClose={() => setSelectedLogForEdit(null)}
+        onUpdateLog={handleUpdateLog}
+        onDeleteLog={handleDeleteLog}
       />
     </MobileFrame>
   );

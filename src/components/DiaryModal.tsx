@@ -1,29 +1,43 @@
 import React, { useState } from 'react';
-import { Camera, Image as ImageIcon, Sparkles, Check, X } from 'lucide-react';
+import { Camera, Sparkles, X, Check } from 'lucide-react';
 import type { PhotoDiaryItem } from '../types';
 
 interface DiaryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddDiary: (item: PhotoDiaryItem) => void;
-  babyDays?: number;
+  onAddDiary: (newItem: PhotoDiaryItem) => void;
+  babyDays: number;
 }
 
-const SAMPLE_BABY_PHOTOS = [
-  '/kongsim.jpg',
-  'https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=600&q=80',
-  'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=600&q=80',
+const PRESET_PHOTOS = [
+  {
+    url: '/kongsim.jpg',
+    label: '콩심이 뒤집기',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+    label: '방긋 미소',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
+    label: '쿨쿨 수면',
+  },
+  {
+    url: 'https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=600&q=80',
+    label: '목욕 시간',
+  },
 ];
 
 export const DiaryModal: React.FC<DiaryModalProps> = ({
   isOpen,
   onClose,
   onAddDiary,
-  babyDays = 120,
+  babyDays,
 }) => {
-  const [selectedPhoto, setSelectedPhoto] = useState<string>(SAMPLE_BABY_PHOTOS[0]);
-  const [moodEmoji, setMoodEmoji] = useState<string>('👶');
-  const [content, setContent] = useState<string>('');
+  const [selectedPhoto, setSelectedPhoto] = useState(PRESET_PHOTOS[0].url);
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
+  const [moodEmoji, setMoodEmoji] = useState('👶');
 
   if (!isOpen) return null;
 
@@ -31,44 +45,38 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
     e.preventDefault();
     if (!content.trim()) return;
 
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getDate().toString().padStart(2, '0')}`;
+
     const newItem: PhotoDiaryItem = {
       id: Date.now().toString(),
-      babyDays: babyDays,
-      date: new Date().toLocaleDateString('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }),
+      babyDays,
+      date: dateStr,
       imageUrl: selectedPhoto,
-      moodEmoji: moodEmoji,
+      moodEmoji,
+      title: title.trim() || '오늘 처음으로 혼자 뒤집기 성공!',
       content: content.trim(),
       likesCount: 1,
-      isLiked: true,
-      crmProduct: {
-        title: '📸 첫 뒤집기 성장 기념 굿즈',
-        productName: '아기 성장 아크릴 포토액자 1+1 커스텀',
-        discountText: 'D2C 다이어리 작성 20% 특별 쿠폰',
-        price: '15,200원',
-        tag: '추억 소장 큐레이션',
-      },
+      isLiked: false,
     };
 
     onAddDiary(newItem);
+    setTitle('');
     setContent('');
     onClose();
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-0 sm:p-4">
-      <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up">
+      <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-cream-200 pb-4 mb-4">
+        <div className="flex items-center justify-between border-b border-cream-200 pb-3.5 mb-4">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-coral-100 flex items-center justify-center text-coral-600">
+            <div className="w-10 h-10 rounded-2xl bg-coral-100 flex items-center justify-center text-coral-600 font-bold">
               <Camera className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-gray-900">오늘의 포토 육아일기</h3>
+              <h3 className="font-extrabold text-lg text-gray-900">오늘의 포토 육아일기</h3>
               <p className="text-xs text-gray-500">우리 아기 +{babyDays}일째 순간 기록</p>
             </div>
           </div>
@@ -84,34 +92,34 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
           {/* Photo Preview & Selector */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">
-              사진 선택 및 프리뷰
+              사진 선택
             </label>
-            <div className="relative rounded-2xl overflow-hidden h-48 border border-gray-200 shadow-inner bg-gray-100">
+            <div className="relative rounded-xl overflow-hidden w-20 h-20 mx-auto border border-cream-300 shadow-inner bg-white flex items-center justify-center p-0.5 my-2">
               <img
                 src={selectedPhoto}
-                alt="아기 사진 프리뷰"
-                className="w-full h-full object-cover"
+                alt="아기 사진 미리보기"
+                className="w-full h-full object-cover rounded-lg"
               />
-              <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] text-white font-medium flex items-center gap-1">
-                <ImageIcon className="w-3 h-3" />
-                미리보기
-              </div>
             </div>
 
-            {/* Thumbnail Pickers */}
-            <div className="flex gap-2 mt-2">
-              {SAMPLE_BABY_PHOTOS.map((photo, idx) => (
+            {/* Photo Pickers */}
+            <div className="grid grid-cols-4 gap-2 mt-2">
+              {PRESET_PHOTOS.map((p, idx) => (
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => setSelectedPhoto(photo)}
-                  className={`w-14 h-14 rounded-xl overflow-hidden border-2 transition-all ${
-                    selectedPhoto === photo
-                      ? 'border-coral-500 scale-105 shadow-sm'
-                      : 'border-transparent opacity-70 hover:opacity-100'
+                  onClick={() => setSelectedPhoto(p.url)}
+                  className={`relative rounded-xl overflow-hidden aspect-square border-2 transition-all ${
+                    selectedPhoto === p.url
+                      ? 'border-coral-500 ring-2 ring-coral-200 scale-105'
+                      : 'border-cream-200 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <img src={photo} alt="Sample" className="w-full h-full object-cover" />
+                  <img
+                    src={p.url}
+                    alt={p.label}
+                    className="w-full h-full object-cover"
+                  />
                 </button>
               ))}
             </div>
@@ -120,18 +128,18 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
           {/* Mood Emoji Picker */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">
-              오늘의 기분 이모지
+              오늘의 감정 기분
             </label>
-            <div className="flex justify-between bg-cream-50 p-2 rounded-2xl border border-cream-200">
-              {['👶', '😄', '😴', '🥺', '🥳', '🍼'].map((emoji) => (
+            <div className="flex justify-around bg-cream-50 p-2 rounded-2xl border border-cream-200">
+              {['👶', '🥰', '😴', '🥳', '👼', '💖'].map((emoji) => (
                 <button
                   key={emoji}
                   type="button"
                   onClick={() => setMoodEmoji(emoji)}
-                  className={`w-10 h-10 rounded-xl text-xl flex items-center justify-center transition-all ${
+                  className={`w-9 h-9 rounded-xl text-xl flex items-center justify-center transition-all ${
                     moodEmoji === emoji
-                      ? 'bg-white shadow-md scale-110 border border-coral-200'
-                      : 'hover:bg-white/60'
+                      ? 'bg-white shadow-sm border border-coral-200 scale-110'
+                      : 'hover:bg-cream-100'
                   }`}
                 >
                   {emoji}
@@ -140,29 +148,44 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
             </div>
           </div>
 
-          {/* Text Input */}
+          {/* Separate Title Field */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">
-              오늘의 한 줄 일기
+              일기 제목
             </label>
             <input
               type="text"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="예: 오늘 처음으로 뒤집기 성공했어요! 👶"
-              className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-coral-400"
-              maxLength={60}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="예: 오늘 처음으로 혼자 뒤집기 성공!"
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-bold text-gray-900 focus:ring-2 focus:ring-coral-400 focus:outline-none"
               required
             />
           </div>
 
-          {/* Submit Button */}
+          {/* Separate Content Textarea Field */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center justify-between">
+              <span>일기 본문 내용</span>
+              <span className="text-[10px] text-gray-400">{content.length} / 500자</span>
+            </label>
+            <textarea
+              rows={4}
+              maxLength={500}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              placeholder="오늘 콩심이의 놀이, 행동, 감동적인 육아 기억을 넉넉하게 적어주세요..."
+              className="w-full p-3 rounded-xl border border-gray-300 text-xs leading-relaxed text-gray-900 focus:ring-2 focus:ring-coral-400 focus:outline-none bg-cream-50/40"
+              required
+            />
+          </div>
+
           <button
             type="submit"
-            className="w-full py-3.5 rounded-2xl bg-coral-500 text-white font-bold text-base shadow-float hover:bg-coral-600 active:scale-[0.99] transition-all flex items-center justify-center gap-2"
+            className="w-full py-3.5 rounded-2xl bg-coral-500 text-white font-extrabold text-sm shadow-md hover:bg-coral-600 active:scale-95 transition-all flex items-center justify-center gap-2"
           >
-            <Check className="w-5 h-5" />
-            폴라로이드 일기 등록하기
+            <Check className="w-4 h-4 stroke-[3]" />
+            포토 일기 등록하기
           </button>
         </form>
       </div>
