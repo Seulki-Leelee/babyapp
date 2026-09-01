@@ -10,7 +10,7 @@ interface DiaryModalProps {
 }
 
 const SAMPLE_BABY_PHOTOS = [
-  'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+  '/kongsim.jpg',
   'https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=600&q=80',
   'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=600&q=80',
 ];

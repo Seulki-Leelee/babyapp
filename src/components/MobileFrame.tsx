@@ -32,19 +32,21 @@ export const MobileFrame: React.FC<MobileFrameProps> = ({
       {/* Top App Header Bar */}
       <header className="bg-cream-100/90 backdrop-blur-md px-4 py-3 flex items-center justify-between border-b border-cream-200/80 z-20 sticky top-7">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-coral-500 text-white flex items-center justify-center font-bold text-sm shadow-sm">
-            👶
-          </div>
+          <img
+            src="/kongsim.jpg"
+            alt="콩심이 프로필"
+            className="w-9 h-9 rounded-full object-cover border-2 border-coral-300 shadow-sm shrink-0"
+          />
           <div>
             <div className="flex items-center gap-1.5">
               <h1 className="font-black text-sm text-gray-900 tracking-tight">
-                김로아네 육아 CRM
+                콩심이네
               </h1>
               <span className="bg-coral-100 text-coral-600 font-extrabold text-[10px] px-2 py-0.2 rounded-full">
-                D+120일
+                D+110일
               </span>
             </div>
-            <p className="text-[10px] text-gray-500">순둥이 2단계 • 분유 완분 케어</p>
+            <p className="text-[10px] text-gray-500">하기스네이처메이드 3단계 • 분유 완분 케어</p>
           </div>
         </div>
 
@@ -69,11 +71,10 @@ export const MobileFrame: React.FC<MobileFrameProps> = ({
         {/* Tab 1: Home */}
         <button
           onClick={() => onChangeTab('home')}
-          className={`flex flex-col items-center py-1 transition-all ${
-            activeTab === 'home'
-              ? 'text-coral-500 scale-105 font-bold'
-              : 'text-gray-400 hover:text-gray-600'
-          }`}
+          className={`flex flex-col items-center py-1 transition-all ${activeTab === 'home'
+            ? 'text-coral-500 scale-105 font-bold'
+            : 'text-gray-400 hover:text-gray-600'
+            }`}
         >
           <div className="relative">
             <Home className="w-5 h-5" />
@@ -87,11 +88,10 @@ export const MobileFrame: React.FC<MobileFrameProps> = ({
         {/* Tab 2: Care & Shop */}
         <button
           onClick={() => onChangeTab('care')}
-          className={`flex flex-col items-center py-1 transition-all ${
-            activeTab === 'care'
-              ? 'text-coral-500 scale-105 font-bold'
-              : 'text-gray-400 hover:text-gray-600'
-          }`}
+          className={`flex flex-col items-center py-1 transition-all ${activeTab === 'care'
+            ? 'text-coral-500 scale-105 font-bold'
+            : 'text-gray-400 hover:text-gray-600'
+            }`}
         >
           <div className="relative">
             <Heart className="w-5 h-5" />
@@ -108,11 +108,10 @@ export const MobileFrame: React.FC<MobileFrameProps> = ({
         {/* Tab 3: Diary */}
         <button
           onClick={() => onChangeTab('diary')}
-          className={`flex flex-col items-center py-1 transition-all ${
-            activeTab === 'diary'
-              ? 'text-coral-500 scale-105 font-bold'
-              : 'text-gray-400 hover:text-gray-600'
-          }`}
+          className={`flex flex-col items-center py-1 transition-all ${activeTab === 'diary'
+            ? 'text-coral-500 scale-105 font-bold'
+            : 'text-gray-400 hover:text-gray-600'
+            }`}
         >
           <div className="relative">
             <BookOpen className="w-5 h-5" />

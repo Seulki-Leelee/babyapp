@@ -106,7 +106,7 @@ export const App: React.FC = () => {
       id: 'init-1',
       babyDays: 120,
       date: '2026.09.01',
-      imageUrl: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+      imageUrl: '/kongsim.jpg',
       moodEmoji: '👶',
       content: '오늘 처음으로 뒤집기 성공했어요! 👶',
       likesCount: 12,
