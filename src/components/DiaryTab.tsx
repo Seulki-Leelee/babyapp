@@ -17,9 +17,13 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
   onToggleLike,
   onSelectProduct,
 }) => {
-  // Base selected date (Default to 2026-09-01)
+  // Base selected date (Default to 2026.09.01)
   const [selectedDate, setSelectedDate] = useState<string>('2026.09.01');
   const [isCalendarModalOpen, setIsCalendarModalOpen] = useState(false);
+
+  // Month navigation state for Calendar Modal (default to Year 2026, Month 9 - 1 = 8)
+  const [calendarYear, setCalendarYear] = useState<number>(2026);
+  const [calendarMonth, setCalendarMonth] = useState<number>(8); // 0-indexed: 8 = September
 
   // Active diary modal readers
   const [selectedDiaryForRead, setSelectedDiaryForRead] = useState<PhotoDiaryItem | null>(null);
@@ -63,6 +67,34 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
   // Find diary for currently selected date or closest diary
   const matchedDiary = diaries.find((d) => d.date === selectedDate) || diaries[0];
 
+  // Month navigation handlers
+  const handlePrevMonth = () => {
+    if (calendarMonth === 0) {
+      setCalendarYear(calendarYear - 1);
+      setCalendarMonth(11);
+    } else {
+      setCalendarMonth(calendarMonth - 1);
+    }
+  };
+
+  const handleNextMonth = () => {
+    if (calendarMonth === 11) {
+      setCalendarYear(calendarYear + 1);
+      setCalendarMonth(0);
+    } else {
+      setCalendarMonth(calendarMonth + 1);
+    }
+  };
+
+  // Generate monthly calendar grid
+  const getDaysInMonth = (year: number, month: number) => {
+    const firstDay = new Date(year, month, 1).getDay(); // 0 (Sun) to 6 (Sat)
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    return { firstDay, totalDays };
+  };
+
+  const { firstDay, totalDays } = getDaysInMonth(calendarYear, calendarMonth);
+
   return (
     <div className="space-y-4 pb-20">
       {/* 1. Compact Header Banner */}
@@ -90,10 +122,10 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </button>
       </div>
 
-      {/* 2. Interactive Calendar Date Selector (달력 아이콘 터치 시 달력 선택 팝업 모달) */}
+      {/* 2. Interactive Calendar Date Selector */}
       <div className="bg-white rounded-2xl p-3 border border-cream-200 shadow-soft space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          {/* Calendar Icon Button -> Click to open Calendar Modal */}
+          {/* Calendar Icon Button -> Click to open Monthly Calendar Modal */}
           <button
             onClick={() => setIsCalendarModalOpen(true)}
             className="flex items-center gap-2 group active:scale-95 transition-transform"
@@ -288,18 +320,19 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </div>
       </div>
 
-      {/* FULL CALENDAR PICKER MODAL (달력 전체 팝업 모달) */}
+      {/* FULL MONTHLY CALENDAR PICKER MODAL (월 단위 전체 달력 선택 팝업) */}
       {isCalendarModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
           <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up space-y-4">
+            {/* Header */}
             <div className="flex items-center justify-between border-b border-cream-200 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-coral-100 text-coral-600 flex items-center justify-center font-bold">
                   <CalendarIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-base text-gray-900">육아일기 날짜 선택</h3>
-                  <p className="text-xs text-gray-500">과거 어느 날짜든 자유롭게 선택하세요</p>
+                  <h3 className="font-black text-base text-gray-900">월별 육아일기 날짜 선택</h3>
+                  <p className="text-xs text-gray-500">원하시는 연/월로 변경하여 탐색하세요</p>
                 </div>
               </div>
               <button
@@ -310,13 +343,32 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
               </button>
             </div>
 
-            {/* Calendar Grid (2026.08 & 2026.09) */}
+            {/* Monthly Calendar Header Controls (월 단위 이전/다음 변경) */}
             <div className="space-y-3">
-              <div className="text-xs font-black text-gray-800 text-center bg-cream-100 py-1.5 rounded-xl border border-cream-200">
-                📅 2026년 8월 ~ 9월 선택
+              <div className="flex items-center justify-between bg-cream-100 px-4 py-2.5 rounded-2xl border border-cream-200">
+                <button
+                  type="button"
+                  onClick={handlePrevMonth}
+                  className="p-1.5 rounded-xl bg-white text-gray-700 hover:bg-cream-200 border border-cream-300 font-bold active:scale-95 transition-transform"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                <div className="font-extrabold text-sm text-gray-900">
+                  📅 {calendarYear}년 {calendarMonth + 1}월
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextMonth}
+                  className="p-1.5 rounded-xl bg-white text-gray-700 hover:bg-cream-200 border border-cream-300 font-bold active:scale-95 transition-transform"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-7 gap-1.5 text-center text-xs font-bold text-gray-400 py-1">
+              {/* Day of Week Headers */}
+              <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 py-1">
                 <span className="text-red-500">일</span>
                 <span>월</span>
                 <span>화</span>
@@ -326,26 +378,37 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 <span className="text-blue-500">토</span>
               </div>
 
-              {/* Sample Dates 2026.08.15 ~ 2026.09.05 */}
+              {/* Monthly Calendar Day Grid Generator */}
               <div className="grid grid-cols-7 gap-1.5 text-center">
-                {['2026.08.15', '2026.08.16', '2026.08.17', '2026.08.18', '2026.08.19', '2026.08.20', '2026.08.21', '2026.08.22', '2026.08.23', '2026.08.24', '2026.08.25', '2026.08.26', '2026.08.27', '2026.08.28', '2026.08.29', '2026.08.30', '2026.08.31', '2026.09.01', '2026.09.02', '2026.09.03', '2026.09.04'].map((dStr) => {
-                  const dayNum = parseInt(dStr.slice(8));
-                  const isSelected = selectedDate === dStr;
-                  const hasDiary = diaries.some((di) => di.date === dStr);
+                {/* Empty padding slots for first day offset */}
+                {Array.from({ length: firstDay }).map((_, idx) => (
+                  <div key={`empty-${idx}`} className="p-2.5"></div>
+                ))}
+
+                {/* Actual Days of the Month */}
+                {Array.from({ length: totalDays }).map((_, idx) => {
+                  const dayNum = idx + 1;
+                  const mm = (calendarMonth + 1).toString().padStart(2, '0');
+                  const dd = dayNum.toString().padStart(2, '0');
+                  const dateStr = `${calendarYear}.${mm}.${dd}`;
+
+                  const isSelected = selectedDate === dateStr;
+                  const hasDiary = diaries.some((di) => di.date === dateStr);
 
                   return (
                     <button
-                      key={dStr}
+                      key={dateStr}
+                      type="button"
                       onClick={() => {
-                        setSelectedDate(dStr);
+                        setSelectedDate(dateStr);
                         setIsCalendarModalOpen(false);
                       }}
                       className={`p-2.5 rounded-xl text-xs font-black transition-all relative ${
                         isSelected
-                          ? 'bg-coral-500 text-white shadow-md scale-105'
+                          ? 'bg-coral-500 text-white shadow-md scale-105 ring-2 ring-coral-300'
                           : hasDiary
-                          ? 'bg-cream-100 text-gray-900 border border-coral-300'
-                          : 'bg-gray-50 text-gray-600 hover:bg-cream-50'
+                          ? 'bg-amber-100 text-amber-900 border border-amber-300 font-extrabold'
+                          : 'bg-gray-50 text-gray-700 hover:bg-cream-100'
                       }`}
                     >
                       <span>{dayNum}</span>
@@ -359,6 +422,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
             </div>
 
             <button
+              type="button"
               onClick={() => setIsCalendarModalOpen(false)}
               className="w-full py-3 rounded-2xl bg-gray-900 text-white font-extrabold text-sm hover:bg-gray-800"
             >
