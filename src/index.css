@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #1a1c23;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+  }
+}
+
+/* Custom scrollbar for mobile container */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Glassmorphism helpers */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+.glass-pill {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(255, 107, 87, 0.4); }
+  50% { border-color: rgba(255, 107, 87, 0.9); }
+}
+
+.animate-pulse-border {
+  animation: pulseBorder 1.8s infinite;
+}
