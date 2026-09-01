@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Sparkles, X, Check } from 'lucide-react';
+import { Camera, Sparkles, X, Check, Calendar as CalendarIcon } from 'lucide-react';
 import type { PhotoDiaryItem } from '../types';
 
 interface DiaryModalProps {
@@ -35,6 +35,7 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
   babyDays,
 }) => {
   const [selectedPhoto, setSelectedPhoto] = useState(PRESET_PHOTOS[0].url);
+  const [selectedDateVal, setSelectedDateVal] = useState('2026-09-01');
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [moodEmoji, setMoodEmoji] = useState('👶');
@@ -45,13 +46,20 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
     e.preventDefault();
     if (!content.trim()) return;
 
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getDate().toString().padStart(2, '0')}`;
+    // Format selectedDateVal (YYYY-MM-DD -> YYYY.MM.DD)
+    const dateFormatted = selectedDateVal.replace(/-/g, '.');
+
+    // Calculate baby days relative to 2026.09.01 (D+110)
+    const parts = selectedDateVal.split('-').map(Number);
+    const d = new Date(parts[0], parts[1] - 1, parts[2]);
+    const baseD = new Date(2026, 8, 1);
+    const diffDays = Math.floor((d.getTime() - baseD.getTime()) / (1000 * 60 * 60 * 24));
+    const calculatedDays = 110 + diffDays;
 
     const newItem: PhotoDiaryItem = {
       id: Date.now().toString(),
-      babyDays,
-      date: dateStr,
+      babyDays: calculatedDays,
+      date: dateFormatted,
       imageUrl: selectedPhoto,
       moodEmoji,
       title: title.trim() || '오늘 처음으로 혼자 뒤집기 성공!',
@@ -77,7 +85,7 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
             </div>
             <div>
               <h3 className="font-extrabold text-lg text-gray-900">오늘의 포토 육아일기</h3>
-              <p className="text-xs text-gray-500">우리 아기 +{babyDays}일째 순간 기록</p>
+              <p className="text-xs text-gray-500">오늘 및 과거 날짜 선택하여 일기 작성</p>
             </div>
           </div>
           <button
@@ -89,6 +97,22 @@ export const DiaryModal: React.FC<DiaryModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* 1. Date Selector (기본 오늘, 과거 날짜 선택 가능) */}
+          <div>
+            <label className="block text-xs font-bold text-gray-700 mb-1.5 flex items-center gap-1">
+              <CalendarIcon className="w-3.5 h-3.5 text-coral-500" />
+              일기 날짜 선택 (과거 일기 작성 가능)
+            </label>
+            <input
+              type="date"
+              value={selectedDateVal}
+              max="2026-12-31"
+              onChange={(e) => setSelectedDateVal(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-xl border border-gray-300 text-xs font-extrabold text-gray-900 focus:ring-2 focus:ring-coral-400 focus:outline-none bg-cream-50"
+              required
+            />
+          </div>
+
           {/* Photo Preview & Selector */}
           <div>
             <label className="block text-xs font-bold text-gray-700 mb-1.5">

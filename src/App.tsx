@@ -102,7 +102,7 @@ export const App: React.FC = () => {
     },
   ]);
 
-  // 6. Parenting Timeline Logs (4 Initial Items)
+  // 6. Parenting Timeline Logs
   const [logs, setLogs] = useState<TimelineLog[]>([
     {
       id: '1',
@@ -140,7 +140,7 @@ export const App: React.FC = () => {
     },
   ]);
 
-  // 7. Photo Diary
+  // 7. Photo Diaries for Today and Past 5 Days (과거 5일간의 포토일기 데이터)
   const [diaries, setDiaries] = useState<PhotoDiaryItem[]>([
     {
       id: 'init-1',
@@ -152,13 +152,61 @@ export const App: React.FC = () => {
       content: '오늘 아침 콩심이가 끙차 소리를 내며 온몸에 힘을 주더니, 드디어 혼자 힘으로 완전히 360도 뒤집기에 성공했다! 뒤집고 나서 스스로가 대견했는지 눈을 동그랗게 뜨고 환하게 웃는데 정말 감동이었다.',
       likesCount: 12,
       isLiked: true,
-      crmProduct: {
-        title: '📸 첫 뒤집기 성장 기념 굿즈',
-        productName: '아기 성장 아크릴 포토액자 1+1 커스텀',
-        discountText: 'D2C 작성 20% 특별 쿠폰',
-        price: '15,200원',
-        tag: '추억 소장 큐레이션',
-      },
+    },
+    {
+      id: 'init-2',
+      babyDays: 109,
+      date: '2026.08.31',
+      imageUrl: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?auto=format&fit=crop&w=600&q=80',
+      moodEmoji: '🥰',
+      title: '터미타임 5분 버티기 신기록달성',
+      content: '엎드려서 고개 높이 들기 연습 5분 돌파! 안전 거울에 비친 자기 얼굴을 보며 아구아구 옹알이하는 모습이 너무 귀여웠다.',
+      likesCount: 8,
+      isLiked: true,
+    },
+    {
+      id: 'init-3',
+      babyDays: 108,
+      date: '2026.08.30',
+      imageUrl: 'https://images.unsplash.com/photo-1555252333-9f8e92e65df9?auto=format&fit=crop&w=600&q=80',
+      moodEmoji: '🥳',
+      title: '소리 내어 깔깔깔 장난친 날',
+      content: '아빠가 간지럼을 태워주자 처음으로 깔깔 소리 내어 크게 웃었다. 집안 전체가 콩심이 웃음소리로 가득 차서 온 가족이 행복했던 하루.',
+      likesCount: 15,
+      isLiked: false,
+    },
+    {
+      id: 'init-4',
+      babyDays: 107,
+      date: '2026.08.29',
+      imageUrl: 'https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=600&q=80',
+      moodEmoji: '🛁',
+      title: '시원한 쿨링 입욕 목욕 타임',
+      content: '따뜻한 미온수에 하이드로 바스 입욕제를 넣고 목욕시켰더니 물장구를 치며 신이 났다. 목욕 후 분유 180ml 싹 비우고 꿀잠 입면!',
+      likesCount: 6,
+      isLiked: false,
+    },
+    {
+      id: 'init-5',
+      babyDays: 106,
+      date: '2026.08.28',
+      imageUrl: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=600&q=80',
+      moodEmoji: '🔔',
+      title: '손목 딸랑이 신체 인지 성공',
+      content: '오른쪽 손목에 폭신한 딸랑이를 차주었더니 팔을 찰랑찰랑 흔들 때마다 나는 소리에 신기해서 한참을 흔들어 대며 즐거워했다.',
+      likesCount: 10,
+      isLiked: true,
+    },
+    {
+      id: 'init-6',
+      babyDays: 105,
+      date: '2026.08.27',
+      imageUrl: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=600&q=80',
+      moodEmoji: '👼',
+      title: '예방접종 후 쿨링 케어 & 단잠',
+      content: '소아과에서 접종받고 와서 살짝 미열이 났지만 쿨링 패치 붙여주고 잘 케어해 주니 밤새 단잠 자고 열도 쏙 내려갔다. 기특한 콩심이!',
+      likesCount: 9,
+      isLiked: false,
     },
   ]);
 
@@ -243,7 +291,7 @@ export const App: React.FC = () => {
       id: Date.now().toString(),
       type: 'temperature',
       time: timeStr,
-      title: `🌡️ 체온 ${temp.toFixed(1)}°C 측정`,
+      title: `체온 ${temp.toFixed(1)}°C 측정`,
       detail: isFever ? '고열 경고 뱃지 발동 및 해열제 타이머 세팅' : '정상 체온 범위',
       badge: isFever ? '고열 경고 🚨' : undefined,
       iconBg: isFever ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600',
