@@ -77,7 +77,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 콩심이 포토일기 (+{babyDays}일)
               </h2>
             </div>
-            <p className="text-[10px] text-white/90">달력으로 과거 일기를 자유롭게 찾아보세요</p>
+            <p className="text-[10px] text-white/90">달력을 눌러 과거 일기를 자유롭게 찾아보세요</p>
           </div>
         </div>
 
@@ -90,23 +90,26 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </button>
       </div>
 
-      {/* 2. Interactive Calendar Date Selector (달력 팝업 연동 & 앞뒤 5일 슬라이더) */}
+      {/* 2. Interactive Calendar Date Selector (달력 아이콘 터치 시 달력 선택 팝업 모달) */}
       <div className="bg-white rounded-2xl p-3 border border-cream-200 shadow-soft space-y-2.5">
         <div className="flex items-center justify-between px-1">
-          <div className="flex items-center gap-1.5">
-            <CalendarIcon className="w-4 h-4 text-coral-500" />
-            <span className="text-xs font-black text-gray-900">
-              {selectedDate} (앞뒤 5일 탐색)
-            </span>
-          </div>
-
+          {/* Calendar Icon Button -> Click to open Calendar Modal */}
           <button
             onClick={() => setIsCalendarModalOpen(true)}
-            className="px-2.5 py-1 rounded-xl bg-coral-50 text-coral-600 font-extrabold text-[11px] border border-coral-200 hover:bg-coral-100 flex items-center gap-1 shadow-2xs active:scale-95 transition-transform"
+            className="flex items-center gap-2 group active:scale-95 transition-transform"
+            title="달력 선택 팝업 열기"
           >
-            <CalendarIcon className="w-3 h-3" />
-            전체 달력 팝업 ➔
+            <div className="w-7 h-7 rounded-lg bg-coral-100 text-coral-600 flex items-center justify-center font-bold shadow-2xs group-hover:bg-coral-500 group-hover:text-white transition-colors">
+              <CalendarIcon className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-black text-gray-900 group-hover:text-coral-600 transition-colors">
+              {selectedDate} (달력 선택)
+            </span>
           </button>
+
+          <span className="text-[10px] text-gray-400 font-bold">
+            앞뒤 5일 스와이프 ➔
+          </span>
         </div>
 
         {/* 11-Day Window Date Bar (±5 days around selected date) */}
@@ -295,7 +298,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                   <CalendarIcon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="font-black text-base text-gray-900">육아일기 전체 달력 탐색</h3>
+                  <h3 className="font-black text-base text-gray-900">육아일기 날짜 선택</h3>
                   <p className="text-xs text-gray-500">과거 어느 날짜든 자유롭게 선택하세요</p>
                 </div>
               </div>
