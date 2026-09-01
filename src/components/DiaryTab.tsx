@@ -97,7 +97,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
 
   return (
     <div className="space-y-4 pb-20">
-      {/* 1. Compact Header Banner (텍스트 변경: 우리 아이의 오늘을 기록해 보세요.) */}
+      {/* 1. Compact Header Banner */}
       <div className="bg-gradient-to-r from-coral-500 via-rose-500 to-amber-500 rounded-2xl p-3.5 text-white shadow-soft flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-base border border-white/30 shrink-0">
@@ -122,7 +122,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </button>
       </div>
 
-      {/* 2. Interactive Calendar Date Selector */}
+      {/* 2. Interactive Calendar Date Selector ([앞뒤 5일 스와이프] 텍스트 삭제) */}
       <div className="bg-white rounded-2xl p-3 border border-cream-200 shadow-soft space-y-2.5">
         <div className="flex items-center justify-between px-1">
           {/* Calendar Icon Button -> Click to open Monthly Calendar Modal */}
@@ -138,10 +138,6 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
               {selectedDate} (달력 선택)
             </span>
           </button>
-
-          <span className="text-[10px] text-gray-400 font-bold">
-            앞뒤 5일 스와이프 ➔
-          </span>
         </div>
 
         {/* 11-Day Window Date Bar (±5 days around selected date) */}
@@ -163,7 +159,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </div>
       </div>
 
-      {/* 3. Photo Diary Card Display for Selected Date (상단 [선택한 날짜의 포토일기], [기록] 텍스트 제거) */}
+      {/* 3. Photo Diary Card Display for Selected Date */}
       <div className="space-y-2">
         {matchedDiary ? (
           <div
@@ -210,8 +206,8 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
               </div>
             </div>
 
-            {/* Bottom Actions (오른쪽 [터치하여 긴 내용 읽기] 아이콘 텍스트 삭제) */}
-            <div className="flex items-center justify-between pt-1">
+            {/* Bottom Actions (하트 옆에 공유하기 아이콘 연동) */}
+            <div className="flex items-center gap-2 pt-1">
               <button
                 type="button"
                 onClick={(e) => {
@@ -230,6 +226,19 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                   }`}
                 />
                 {matchedDiary.likesCount}
+              </button>
+
+              {/* Share Button right next to Heart Like */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  alert('🔗 일기 링크가 복사되었습니다!');
+                }}
+                className="flex items-center gap-1.5 text-xs font-extrabold px-3 py-1.5 rounded-full bg-cream-50 text-gray-600 border border-cream-200 hover:bg-cream-100 transition-all active:scale-95"
+              >
+                <Share2 className="w-3.5 h-3.5 text-gray-500" />
+                <span>공유하기</span>
               </button>
             </div>
           </div>
@@ -254,7 +263,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         )}
       </div>
 
-      {/* 4. Bottom Milestone Guide ((클릭 시 상세) 텍스트 삭제) */}
+      {/* 4. Bottom Milestone Guide */}
       <div className="bg-gradient-to-br from-indigo-50 via-cream-100 to-amber-50 rounded-3xl p-4 border border-indigo-200/80 shadow-soft space-y-3">
         <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
           <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
