@@ -37,7 +37,7 @@ export const CareShopTab: React.FC<CareShopTabProps> = ({
             </div>
             <div>
               <span className="text-[10px] font-extrabold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                D2C CRM 정품 리필 +1,000P
+                정품 리필 +1,000P
               </span>
               <h3 className="font-extrabold text-sm text-gray-900 mt-0.5">
                 기저귀 패키지 바코드 정품 등록
@@ -179,7 +179,7 @@ export const CareShopTab: React.FC<CareShopTabProps> = ({
         <div className="bg-white rounded-2xl p-3.5 border border-cream-200 shadow-soft">
           <div className="flex items-center justify-between mb-2.5 pb-2 border-b border-gray-100">
             <h4 className="font-extrabold text-xs text-gray-900">
-              콩심이네 추천 필수용품 리필
+              콩심이네 추천 필수용품 추천
             </h4>
             <span className="text-[10px] text-coral-500 font-bold">자사몰 혜택</span>
           </div>

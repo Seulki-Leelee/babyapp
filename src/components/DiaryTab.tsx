@@ -97,7 +97,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
 
   return (
     <div className="space-y-4 pb-20">
-      {/* 1. Compact Header Banner */}
+      {/* 1. Compact Header Banner (텍스트 변경: 우리 아이의 오늘을 기록해 보세요.) */}
       <div className="bg-gradient-to-r from-coral-500 via-rose-500 to-amber-500 rounded-2xl p-3.5 text-white shadow-soft flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-base border border-white/30 shrink-0">
@@ -109,7 +109,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 콩심이 포토일기 (+{babyDays}일)
               </h2>
             </div>
-            <p className="text-[10px] text-white/90">달력을 눌러 과거 일기를 자유롭게 찾아보세요</p>
+            <p className="text-[10px] text-white/90">우리 아이의 오늘을 기록해 보세요.</p>
           </div>
         </div>
 
@@ -163,18 +163,8 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </div>
       </div>
 
-      {/* 3. Photo Diary Card Display for Selected Date */}
+      {/* 3. Photo Diary Card Display for Selected Date (상단 [선택한 날짜의 포토일기], [기록] 텍스트 제거) */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs font-black text-gray-800 flex items-center gap-1">
-            <BookOpen className="w-4 h-4 text-coral-500" />
-            선택한 날짜의 포토일기
-          </span>
-          <span className="text-[10px] text-gray-400 font-bold">
-            {selectedDate} 기록
-          </span>
-        </div>
-
         {matchedDiary ? (
           <div
             onClick={() => setSelectedDiaryForRead(matchedDiary)}
@@ -220,7 +210,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
               </div>
             </div>
 
-            {/* Bottom Actions */}
+            {/* Bottom Actions (오른쪽 [터치하여 긴 내용 읽기] 아이콘 텍스트 삭제) */}
             <div className="flex items-center justify-between pt-1">
               <button
                 type="button"
@@ -241,10 +231,6 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 />
                 {matchedDiary.likesCount}
               </button>
-
-              <span className="text-[11px] text-gray-500 font-bold bg-cream-100 px-3 py-1 rounded-full">
-                터치하여 긴 내용 읽기 ➔
-              </span>
             </div>
           </div>
         ) : (
@@ -268,7 +254,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         )}
       </div>
 
-      {/* 4. Bottom Milestone Guide */}
+      {/* 4. Bottom Milestone Guide ((클릭 시 상세) 텍스트 삭제) */}
       <div className="bg-gradient-to-br from-indigo-50 via-cream-100 to-amber-50 rounded-3xl p-4 border border-indigo-200/80 shadow-soft space-y-3">
         <div className="flex items-center gap-2 border-b border-indigo-100 pb-2">
           <div className="w-7 h-7 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xs shadow-sm">
@@ -276,7 +262,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
           </div>
           <div>
             <h4 className="font-extrabold text-xs text-gray-900">
-              생후 110일 콩심이 발달 & 추천 놀이 (클릭 시 상세)
+              생후 110일 콩심이 발달 & 추천 놀이
             </h4>
           </div>
         </div>
@@ -320,11 +306,10 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
         </div>
       </div>
 
-      {/* FULL MONTHLY CALENDAR PICKER MODAL (월 단위 전체 달력 선택 팝업) */}
+      {/* FULL MONTHLY CALENDAR PICKER MODAL */}
       {isCalendarModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 backdrop-blur-sm p-0 sm:p-4">
           <div className="w-full max-w-[430px] bg-white rounded-t-3xl sm:rounded-3xl p-6 shadow-2xl transition-all animate-slide-up space-y-4">
-            {/* Header */}
             <div className="flex items-center justify-between border-b border-cream-200 pb-3">
               <div className="flex items-center gap-2">
                 <div className="w-9 h-9 rounded-xl bg-coral-100 text-coral-600 flex items-center justify-center font-bold">
@@ -343,7 +328,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
               </button>
             </div>
 
-            {/* Monthly Calendar Header Controls (월 단위 이전/다음 변경) */}
+            {/* Monthly Controls */}
             <div className="space-y-3">
               <div className="flex items-center justify-between bg-cream-100 px-4 py-2.5 rounded-2xl border border-cream-200">
                 <button
@@ -367,7 +352,7 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 </button>
               </div>
 
-              {/* Day of Week Headers */}
+              {/* Day Headers */}
               <div className="grid grid-cols-7 gap-1 text-center text-xs font-bold text-gray-400 py-1">
                 <span className="text-red-500">일</span>
                 <span>월</span>
@@ -378,14 +363,12 @@ export const DiaryTab: React.FC<DiaryTabProps> = ({
                 <span className="text-blue-500">토</span>
               </div>
 
-              {/* Monthly Calendar Day Grid Generator */}
+              {/* Day Grid */}
               <div className="grid grid-cols-7 gap-1.5 text-center">
-                {/* Empty padding slots for first day offset */}
                 {Array.from({ length: firstDay }).map((_, idx) => (
                   <div key={`empty-${idx}`} className="p-2.5"></div>
                 ))}
 
-                {/* Actual Days of the Month */}
                 {Array.from({ length: totalDays }).map((_, idx) => {
                   const dayNum = idx + 1;
                   const mm = (calendarMonth + 1).toString().padStart(2, '0');

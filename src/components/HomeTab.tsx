@@ -177,16 +177,13 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </button>
       </div>
 
-      {/* 2. Horizontal Drag/Scrollable Quick Record Bar */}
+      {/* 2. Horizontal Drag/Scrollable Quick Record Bar (옆으로 스와이프 텍스트 뱃지 제거) */}
       <div className="bg-white rounded-2xl p-4 border border-cream-200 shadow-soft space-y-3">
         <div className="flex justify-between items-center px-0.5">
           <h4 className="font-extrabold text-xs text-gray-900 flex items-center gap-1">
             <Sparkles className="w-4 h-4 text-coral-500" />
             매일 쓰는 원터치 기록
           </h4>
-          <span className="text-[11px] text-coral-500 font-bold flex items-center gap-0.5 bg-coral-50 px-2 py-0.5 rounded-full border border-coral-100">
-            옆으로 스와이프 ➔
-          </span>
         </div>
 
         {/* Large Bold Swipable Icon Container */}
@@ -270,7 +267,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         </div>
       </div>
 
-      {/* 3. Main Spotlight: Chronological Parenting Timeline (Clean titles without duplicated text emojis) */}
+      {/* 3. Main Spotlight: Chronological Parenting Timeline */}
       <div className="bg-white rounded-2xl p-4 border border-cream-200 shadow-soft space-y-3">
         <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
           <div className="flex items-center gap-2">
