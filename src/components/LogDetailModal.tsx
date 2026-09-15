@@ -124,9 +124,9 @@ export const LogDetailModal: React.FC<LogDetailModalProps> = ({
       updatedDetail = `백색소음 입면 수면 ${sleepDuration}`;
     } else if (log.type === 'temperature') {
       const isFever = tempValue >= 38.0;
-      updatedTitle = `체온 ${tempValue.toFixed(1)}°C 측정`;
-      updatedDetail = isFever ? '고열 경고 뱃지 발동 및 해열제 타이머' : '정상 체온 범위';
-      badge = isFever ? '고열 경고 🚨' : undefined;
+      updatedTitle = `${tempValue.toFixed(1)}°C`;
+      updatedDetail = isFever ? '경고 뱃지 발동 및 해열제 타이머' : '정상 체온 범위';
+      badge = isFever ? '경고 🚨' : undefined;
       iconBg = isFever ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
     } else if (log.type === 'medication') {
       updatedTitle = `${medType}`;

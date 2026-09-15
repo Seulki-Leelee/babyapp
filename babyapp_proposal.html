@@ -1,0 +1,332 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>유한킴벌리 맘큐(MomQ) 연계 영유아 라이프사이클 CRM · 기획서</title><style>
+:root{--ink:#0B1220;--s900:#0F172A;--s700:#334155;--s600:#475569;--s500:#64748B;--s400:#94A3B8;
+  --s300:#CBD5E1;--s200:#E2E8F0;--s100:#F1F5F9;--s50:#F8FAFC;
+  --acc:#FF4D4D;--acc2:#FA3838;--acc-50:#FFF5F5;--acc-100:#FFE3E3;--acc-200:#FFC9C9;--acc-700:#C92A2A;
+  --ok:#059669;--ok-50:#ECFDF5;--ok-200:#A7F3D0;--warn:#D97706;--warn-50:#FFFBEB;--warn-200:#FDE68A;
+  --red:#DC2626;--red-50:#FEF2F2;--blue:#0091D5;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--s100);color:var(--ink);font-family:'Pretendard','Malgun Gothic','맑은 고딕','Apple SD Gothic Neo','Segoe UI Emoji','Apple Color Emoji',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.page{max-width:1180px;margin:0 auto;padding:0 20px 64px}
+.topbar{background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--s200);position:sticky;top:0;z-index:50}
+.topbar .in{max-width:1180px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px}
+.topbar .logo-text{font-weight:900;color:var(--acc);font-size:16px;letter-spacing:-0.5px}
+.topbar .t{font-weight:800;color:var(--s900);font-size:14.5px}
+.topbar .meta{margin-left:auto;font-size:11.5px;color:var(--s500);font-weight:600}
+.hero{background:radial-gradient(900px 420px at 88% -10%,rgba(255,77,77,.35),transparent 62%),
+  radial-gradient(700px 380px at 8% 108%,rgba(0,145,213,.34),transparent 60%),
+  linear-gradient(135deg,#0B1220 0%,#17203A 55%,#31103F 100%);
+  color:#fff;border-radius:24px;padding:44px 46px 40px;margin-top:22px;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(11,18,32,.28)}
+.hero:after{content:"";position:absolute;inset:0;
+  background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);
+  background-size:44px 44px;mask-image:radial-gradient(660px 340px at 76% 8%,#000,transparent 72%);pointer-events:none}
+.hero>*{position:relative;z-index:1}
+.kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.11);border:1px solid rgba(255,255,255,.2);
+  padding:7px 15px;border-radius:999px;font-size:11.5px;font-weight:700;letter-spacing:.4px}
+.kicker .dot{width:6px;height:6px;border-radius:50%;background:#FF4D4D;box-shadow:0 0 0 4px rgba(255,77,77,.3)}
+h1.title{font-size:42px;line-height:1.18;letter-spacing:-1.5px;font-weight:800;margin:20px 0 0}
+h1.title .g{background:linear-gradient(100deg,#FFA8A8,#FF7070 52%,#FDE68A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{margin-top:16px;font-size:15.5px;line-height:1.75;color:#CBD5E1;max-width:780px}
+.sub b{color:#fff;font-weight:700}
+.heroStats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:30px}
+.hs{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:15px 17px}
+.hs .n{font-size:27px;font-weight:800;letter-spacing:-1px;line-height:1}
+.hs .n small{font-size:14px;font-weight:700}
+.hs .l{font-size:11.5px;color:#A5B0C4;margin-top:7px;font-weight:600;line-height:1.45}
+section{margin-top:42px}
+.sechead{display:flex;align-items:flex-end;gap:13px;margin-bottom:16px}
+.secno{width:30px;height:30px;border-radius:99px;background:var(--acc-50);color:var(--acc-700);border:1px solid var(--acc-200);
+  font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex:0 0 30px}
+.sechead h2{font-size:21px;letter-spacing:-.6px;font-weight:800;line-height:1.2}
+.sechead p{font-size:12.5px;color:var(--s500);margin-left:auto;text-align:right;line-height:1.5}
+.card{background:#fff;border:1px solid var(--s200);border-radius:16px;padding:22px 24px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.b4{grid-column:span 4}.b5{grid-column:span 5}.b6{grid-column:span 6}.b7{grid-column:span 7}
+.prob{background:linear-gradient(180deg,#FFF7F7,#fff);border-color:#FBD5D5}
+.prob .ph{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:800;color:#B42318;margin-bottom:13px}
+.plist{display:flex;flex-direction:column;gap:11px}
+.pitem{display:flex;gap:11px;align-items:flex-start;font-size:13px;line-height:1.65;color:var(--s700)}
+.pitem .x{flex:0 0 20px;height:20px;border-radius:50%;background:var(--red-50);color:var(--red);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:2px}
+.pitem b{color:#B42318}
+.sol{background:linear-gradient(180deg,#F5FFFA,#fff);border-color:var(--ok-200)}
+.sol .ph{display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:800;color:#065F46;margin-bottom:13px}
+.pitem .o{flex:0 0 20px;height:20px;border-radius:50%;background:var(--ok-50);color:var(--ok);
+  display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-top:2px}
+.pitem strong{color:#065F46}
+.flowwrap{display:flex;gap:0;align-items:stretch;overflow:hidden;border-radius:13px}
+.fstep{flex:1;background:#fff;border:1px solid var(--s200);padding:17px 20px 17px 30px;position:relative;
+  clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%,18px 50%);margin-left:-14px}
+.fstep:first-child{margin-left:0;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 50%,calc(100% - 18px) 100%,0 100%);padding-left:20px;border-radius:11px 0 0 11px}
+.fstep:last-child{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,18px 50%);border-radius:0 11px 11px 0}
+.fstep .fn{width:23px;height:23px;border-radius:7px;background:var(--acc);color:#fff;font-size:11.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin-bottom:9px}
+.fstep h4{font-size:13px;font-weight:800;margin-bottom:4px;line-height:1.3}
+.fstep p{font-size:11.2px;color:var(--s500);line-height:1.55}
+.fstep .tag{display:inline-block;margin-top:8px;background:var(--s100);color:var(--s600);font-size:10.2px;font-weight:700;padding:3px 8px;border-radius:20px}
+.fstep.hi{background:linear-gradient(180deg,var(--acc-50),#fff);border-color:var(--acc-200)}
+.fstep.hi .tag{background:var(--acc-100);color:var(--acc-700)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+.kpi{background:#fff;border:1px solid var(--s200);border-radius:14px;padding:19px 18px;text-align:center}
+.kpi .n{font-size:32px;font-weight:800;letter-spacing:-1.4px;line-height:1;
+  background:linear-gradient(120deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .n small{font-size:15px;-webkit-text-fill-color:var(--acc)}
+.kpi .l{font-size:12px;color:var(--s600);margin-top:9px;font-weight:700}
+.kpi .d{font-size:10.8px;color:var(--s400);margin-top:4px;line-height:1.5}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:12.8px}
+th{background:var(--s900);color:#fff;text-align:left;padding:11px 14px;font-weight:700;font-size:12px}
+th:first-child{border-radius:10px 0 0 0}th:last-child{border-radius:0 10px 0 0}
+td{padding:11px 14px;border-bottom:1px solid var(--s200);vertical-align:top;line-height:1.6}
+tr:last-child td{border-bottom:none}
+td.was{color:var(--s500)}td.now{color:var(--s700);font-weight:600}
+.chip{display:inline-block;background:var(--ok-50);color:#065F46;border:1px solid var(--ok-200);
+  font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.feat{display:flex;gap:12px;align-items:flex-start}
+.feat .ic{flex:0 0 38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:19px;background:var(--acc-50);border:1px solid var(--acc-100)}
+.feat h4{font-size:13.5px;font-weight:800;margin-bottom:4px}
+.feat p{font-size:12px;color:var(--s500);line-height:1.65}
+.feat p b{color:var(--s700)}
+.grpbar{display:flex;align-items:center;gap:10px;margin:26px 0 14px}
+.grpbar .bar{width:4px;height:18px;border-radius:3px;background:var(--acc)}
+.grpbar h3{font-size:16px;font-weight:800;letter-spacing:-.4px}
+.grpbar span{font-size:12px;color:var(--s500);margin-left:auto}
+.genGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.appGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.shot{background:#fff;border:1px solid var(--s200);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(15,23,42,.06);display:flex;flex-direction:column}
+.shot .cap{padding:13px 16px 12px;border-bottom:1px solid var(--s100);display:flex;align-items:flex-start;gap:10px}
+.shot .cap .num{flex:0 0 22px;height:22px;border-radius:6px;background:var(--acc);color:#fff;
+  font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.shot .cap.app .num{background:var(--blue)}
+.shot .cap h5{font-size:13px;font-weight:800;margin-bottom:3px}
+.shot .cap p{font-size:11.3px;color:var(--s500);line-height:1.55}
+.scale{background:linear-gradient(135deg,#0F172A,#31103F);color:#fff;border-radius:20px;padding:30px 32px;position:relative;overflow:hidden}
+.scale:after{content:"";position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,77,77,.34),transparent 68%)}
+.scale>*{position:relative;z-index:1}
+.scale h3{font-size:19px;font-weight:800;margin-bottom:8px}
+.scale .desc{font-size:13px;color:#B7C0D4;line-height:1.75;max-width:800px}
+.deptgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-top:20px}
+.dept{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:11px;padding:12px 11px;text-align:center}
+.dept .e{font-size:19px}.dept .n{font-size:11.5px;font-weight:700;margin-top:6px;line-height:1.35}
+.dept .s{font-size:10px;color:#93A0B8;margin-top:3px}
+.qgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.q{background:#fff;border:1px solid var(--s200);border-radius:12px;padding:15px 16px;border-left:3px solid var(--ok)}
+.q h5{font-size:12.5px;font-weight:800;margin-bottom:5px}
+.q p{font-size:11.5px;color:var(--s500);line-height:1.6}
+.sec{background:var(--warn-50);border:1px solid var(--warn-200);border-left:4px solid var(--warn);border-radius:14px;padding:19px 22px}
+.sec h4{font-size:14px;font-weight:800;color:#78350F;margin-bottom:10px}
+.secl{display:grid;grid-template-columns:repeat(2,1fr);gap:9px 22px}
+.secl div{font-size:12.3px;color:#92400E;line-height:1.65;display:flex;gap:8px;align-items:flex-start}
+.secl div:before{content:"✓";color:var(--warn);font-weight:800;flex:0 0 auto}
+.road{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.rd{background:#fff;border:1px solid var(--s200);border-radius:13px;padding:17px 18px}
+.rd .p{display:inline-block;font-size:10.5px;font-weight:800;padding:3px 9px;border-radius:20px;margin-bottom:9px}
+.rd.n1 .p{background:var(--ok-50);color:#065F46;border:1px solid var(--ok-200)}
+.rd.n2 .p{background:var(--acc-50);color:var(--acc-700);border:1px solid var(--acc-200)}
+.rd.n3 .p{background:var(--s100);color:var(--s600);border:1px solid var(--s200)}
+.rd h4{font-size:13.5px;font-weight:800;margin-bottom:7px}
+.rd ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.rd li{font-size:11.8px;color:var(--s500);line-height:1.6;padding-left:12px;position:relative}
+.rd li:before{content:"·";position:absolute;left:2px;color:var(--s400);font-weight:800}
+.foot{margin-top:40px;padding-top:22px;border-top:1px solid var(--s200);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.foot .l{font-size:11.5px;color:var(--s400);line-height:1.7}
+.foot .r{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.badge{background:#fff;border:1px solid var(--s200);border-radius:20px;padding:6px 13px;font-size:11px;font-weight:700;color:var(--s600)}
+.note{font-size:11.5px;color:var(--s500);line-height:1.7;margin-top:12px;background:var(--s50);border:1px solid var(--s200);border-radius:10px;padding:12px 15px}
+.cta-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:#fff;font-weight:800;font-size:13.5px;padding:10px 22px;border-radius:12px;text-decoration:none;transition:all 0.2s ease;box-shadow:0 4px 12px rgba(255,77,77,0.3)}
+.cta-btn:hover{background:var(--acc2);transform:translateY(-1px)}
+@media print{body{background:#fff}.topbar{position:static}.hero{box-shadow:none}section{break-inside:avoid}}
+@media (max-width:900px){
+  .bento>*{grid-column:span 12!important}
+  .heroStats,.kpis{grid-template-columns:repeat(2,1fr)}
+  .genGrid,.appGrid{grid-template-columns:1fr}
+  .deptgrid,.qgrid,.road,.secl{grid-template-columns:1fr 1fr}
+  .flowwrap{flex-direction:column}
+  .fstep{clip-path:none!important;margin-left:0!important;border-radius:11px!important;padding-left:20px!important}
+  h1.title{font-size:31px}.hero{padding:30px 24px}}
+</style></head><body>
+<div class="topbar"><div class="in">
+  <div class="logo-text">MomQ 맘큐</div>
+  <div class="t">영유아 라이프사이클 CRM & D2C 커머스 솔루션 · 기획서</div>
+  <div class="meta">e-Platform 본부 D2C 팀 · 맘큐 CRM 팀 · 2026.09</div>
+</div></div>
+<div class="page">
+  <div class="hero">
+    <div class="kicker"><span class="dot"></span>VIBE CODING · 맘큐 D2C 공모전 출품작</div>
+    <h1 class="title">일상 육아 기록에 쓰는 1분을,<br><span class="g">자사몰 락인과 1초 리필로 바꿨습니다.</span></h1>
+    <p class="sub">수유·기저귀·수면·체온 데이터를 <b>원터치로 기록</b>하고, 기저귀 소진 타이머가 작동하여
+      <b>맘큐 10% 전용 할인 쿠폰과 정품 바코드 스캔 1초 리필</b>로 외부 쇼핑몰 이탈을 차단합니다.
+      서버 구축이나 App 설치 없이 <b>단일 HTML</b> 파일로 모든 양육 부모가 즉시 시연 및 활용합니다.</p>
+    <div class="heroStats">
+      <div class="hs"><div class="n">100<small>%</small></div><div class="l">자사몰 락인 유도<br>타 이커머스 이탈 방지</div></div>
+      <div class="hs"><div class="n">1<small>초</small></div><div class="l">바코드 스캔 리필<br>정품 기저귀 60매 충전</div></div>
+      <div class="hs"><div class="n">4<small>대</small></div><div class="l">핵심 전략 축<br>기록·AI분석·쌍둥이·굿즈</div></div>
+      <div class="hs"><div class="n">0<small>원</small></div><div class="l">추가 구축 비용<br>독립 실행 단일 HTML</div></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="sechead"><div class="secno">1</div><h2>왜 만들었나</h2>
+      <p>기저귀 소진 시점을 몰라, 외부 이커머스로 이탈하는 고객을 잡습니다</p></div>
+    <div class="bento">
+      <div class="card prob b6"><div class="ph">⚠️ 지금까지의 맘큐 자사몰 마케팅 한계</div>
+        <div class="plist">
+          <div class="pitem"><span class="x">1</span><div><b>소진 시점 포착 불가</b> — 고객의 실제 기저귀 소진 시점을 알지 못해 단발성 무차별 할인 쿠폰만 지속 발행</div></div>
+          <div class="pitem"><span class="x">2</span><div><b>외부 오픈마켓 이탈</b> — 기저귀가 급히 필요한 순간, 맘큐 자사몰 대신 로켓배송 등 외부 이커머스로 이탈</div></div>
+          <div class="pitem"><span class="x">3</span><div><b>맥락 없는 마케팅 피로</b> — 아이의 일상 건강 상태(고열/장 건강)와 무관한 단순 상품 광고로 광고 효과 감소</div></div>
+          <div class="pitem"><span class="x">4</span><div><b>쌍둥이/다자녀 케어 부재</b> — 다자녀 및 쌍둥이를 케어하는 가구 대상의 맞춤형 관리 및 전용 쇼핑 혜택 결여</div></div>
+        </div></div>
+      <div class="card sol b6"><div class="ph">✅ 맘큐 CRM 도입 후 (TO-BE)</div>
+        <div class="plist">
+          <div class="pitem"><span class="o">1</span><div><strong>기록 기반 소진 예측</strong> — 수유/기저귀 교체 기록 누적 시 잔여 수량(18매) 자동 차감 및 적시 리필 제안</div></div>
+          <div class="pitem"><span class="o">2</span><div><strong>1초 바코드 원클릭 리필</strong> — 하기스 정품 바코드 스캔 시 맘큐 전용 10%/15% 쿠폰 즉시 적용 및 리필 연결</div></div>
+          <div class="pitem"><span class="o">3</span><div><strong>AI 헬스케어 맥락 추천</strong> — 38.2ºC 고열 측정 시 해열제 타이머 연동 그린핑거 쿨링패치/수딩밤 긴급 큐레이션</div></div>
+          <div class="pitem"><span class="o">4</span><div><strong>쌍둥이/다둥이 우선 선택 UX</strong> — 상단 프로필 클릭 시 쌍둥이 아기 선택 화면이 기본으로 열려 다자녀 가구 락인</div></div>
+        </div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><div class="secno">2</div><h2>어떻게 동작하나</h2>
+      <p>5단계 유저 저니 · 일상 기록에서 맘큐 결제까지 seamless하게 연결됩니다</p></div>
+    <div class="flowwrap">
+      <div class="fstep hi"><div class="fn">1</div><h4>일상 기록 & 쌍둥이 선택</h4>
+        <p>수유·기저귀·체온 원터치 입력 및 상단 클릭 시 쌍둥이 선택 기본 제공</p><span class="tag">매일 습관</span></div>
+      <div class="fstep"><div class="fn">2</div><h4>이상 상태 감지</h4>
+        <p>38.2ºC 고열 측정 또는 기저귀 18매 소진 임박 자동 감지</p><span class="tag">실시간 감지</span></div>
+      <div class="fstep hi"><div class="fn">3</div><h4>스마트 알림 배너</h4>
+        <p>해열제 타이머 및 "관찰해 드려요!" 2줄 가이드 배너 노출</p><span class="tag">맥락 큐레이션</span></div>
+      <div class="fstep"><div class="fn">4</div><h4>맘큐 원클릭 리필</h4>
+        <p>바코드 스캔 60매 충전 및 맘큐 전용 쿠폰 1초 적용</p><span class="tag">자사몰 결제</span></div>
+      <div class="fstep"><div class="fn">5</div><h4>포토일기 & 굿즈</h4>
+        <p>폴라로이드 일기 작성 및 커스텀 실물 아크릴 액자 소장</p><span class="tag">LTV 확장</span></div>
+    </div>
+    <div class="note">💡 <b>핵심 설계 원칙</b> — 단순 쇼핑몰이 아닌 <b>부모의 일상 필수 육아 도구</b>로 포지셔닝합니다.
+      아기의 <b>체온, 소진 수량, 건강 상태 데이터</b>를 바탕으로 맘큐 자사몰 상품과 1:1 결합하여 이탈을 완벽 차단합니다.</div>
+  </section>
+
+  <section>
+    <div class="sechead"><div class="secno">3</div><h2>4대 핵심 전략 & 기능 구현</h2>
+      <p>실제 동작하는 맘큐 라이프사이클 CRM의 핵심 솔루션입니다</p></div>
+    
+    <div class="bento">
+      <div class="card b6">
+        <div class="feat">
+          <div class="ic">⏱️</div>
+          <div>
+            <h4>01. 고빈도 UX & 쌍둥이/다둥이 기본 선택</h4>
+            <p>수유(ml), 기저귀(소변/대변), 낮잠, 체온을 1초 만에 기록하는 원터치 기록 바 제공. 상단 프로필 클릭 시 <b>쌍둥이/다둥이 아기 선택 팝업이 기본 제공</b>되어 다자녀 가구가 손쉽게 타임라인을 전환 관리합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card b6">
+        <div class="feat">
+          <div class="ic">📦</div>
+          <div>
+            <h4>02. 하기스 기저귀 소진 감지 & 맘큐 바코드 리필</h4>
+            <p>기저귀 기록 시 잔여 수량 자동 차감(18매 소진 임박 경고). <b>맘큐 전용 10%/15% 쿠폰 즉시 발급</b> 및 정품 바코드 카메라 스캔으로 60매 1초 원클릭 맘큐 리필 주문에 연동합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card b6">
+        <div class="feat">
+          <div class="ic">🤖</div>
+          <div>
+            <h4>03. AI 헬스케어 & 38.2ºC 고열 긴급 큐레이션</h4>
+            <p>대변/피부 사진 스캔 시 장 건강도(95점) AI 분석 ➔ 유산균 기획전 연결. 체온 측정 시 <b>38.2ºC / 경고 뱃지</b> 한 줄 노출 및 4시간 해열제 교차투여 타이머와 함께 그린핑거 쿨링패치/수딩밤 긴급 카드를 제시합니다.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card b6">
+        <div class="feat">
+          <div class="ic">🖼️</div>
+          <div>
+            <h4>04. 포토 육아일기 & 커스텀 포토액자 굿즈</h4>
+            <p>D-Day 성장 순간(뒤집기 성공 등)을 폴라로이드 감성 피드로 기록. 아기의 특별한 성장 순간을 실물 소장할 수 있도록 <b>맘큐 커스텀 아크릴 포토액자 굿즈</b> 커머스로 자연스럽게 연계합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px; text-align:center; padding:20px;">
+      <a href="./babyapp_final.html" target="_blank" class="cta-btn">
+        📱 실제 작동하는 babyapp_final.html 시연 앱 열기 ➔
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><div class="secno">4</div><h2>비즈니스 모델 & 마케팅 확장 방안</h2>
+      <p>맘큐 자사몰 매출 극대화 및 서비스 확장 로드맵입니다</p></div>
+    
+    <div class="kpis">
+      <div class="kpi"><div class="n">맘큐<small> 락인</small></div><div class="l">자사몰 재구매 유도</div><div class="d">소진 임박 바코드 쿠폰으로 외부 플랫폼 이탈 방지</div></div>
+      <div class="kpi"><div class="n">맥락<small> 큐레이션</small></div><div class="l">AI 헬스케어 추천</div><div class="d">38.2ºC 체온/장 건강 데이터 연계 1:1 맞춤 추천</div></div>
+      <div class="kpi"><div class="n">LTV<small> 극대화</small></div><div class="l">고객 생애 가치 확장</div><div class="d">소모품부터 케어용품, 커스텀 굿즈까지 연속 매출</div></div>
+      <div class="kpi"><div class="n">3세대<small> 유입</small></div><div class="l">가구 단위 회원 확보</div><div class="d">엄마·아빠·조부모 육아 교대를 통한 신규 회원 유입</div></div>
+    </div>
+
+    <div class="scale" style="margin-top:16px">
+      <h3>👶 부모와 아이의 생애주기를 아우르는 커머스 확장 설계</h3>
+      <p class="desc">단순 일회성 구매를 넘어 <b style="color:#fff">"아기 월령 · 건강 데이터 · 소진 시점"</b>이라는 핵심 축으로 고객을 분류합니다.
+        신생아기 수유/기저귀부터 영유아기 스킨케어, 다자녀 특가 패키지, 커스텀 굿즈까지 <b style="color:#fff">아이의 성장 단계별 맘큐 생태계</b>로 확장됩니다.</p>
+      <div class="deptgrid">
+        <div class="dept"><div class="e">🍼</div><div class="n">0~6개월<br>수유/기저귀</div><div class="s">소진 감지</div></div>
+        <div class="dept"><div class="e">🌡️</div><div class="n">6~12개월<br>체온/케어</div><div class="s">고열 큐레이션</div></div>
+        <div class="dept"><div class="e">🌿</div><div class="n">12~24개월<br>스킨케어</div><div class="s">그린핑거 연동</div></div>
+        <div class="dept"><div class="e">👶👶</div><div class="n">쌍둥이/다자녀<br>전용 패키지</div><div class="s">우선 선택 UI</div></div>
+        <div class="dept"><div class="e">🖼️</div><div class="n">전 월령<br>포토 굿즈</div><div class="s">액자 커머스</div></div>
+      </div>
+    </div>
+
+    <div class="bento" style="margin-top:14px">
+      <div class="card b6"><div class="feat"><div class="ic">🎯</div><div><h4>1. 데이터 기반 정밀 CRM & 정기구독 유도</h4>
+        <p>월령, 기저귀 단계 교체 주기(2단계➔3단계), 체온 반응 데이터를 분석하여 맘큐 전용 쿠폰 자동 발행 및 <b>'맘큐 1초 자동 정기구독(Subscription)'</b> 서비스로 유도하여 고정 매출을 창출합니다.</p></div></div></div>
+      <div class="card b6"><div class="feat"><div class="ic">💰</div><div><h4>2. 맘큐 리워드(Care-to-Earn) & 정품 락인</h4>
+        <p>매일 육아 기록 작성 시 맘큐 포인트(100P~500P)를 리워드로 지급하여 일일 방문(DAU)을 유도하고, 정품 바코드 스캔 시 포인트 적립 및 정품 전용 할인으로 병행수입 유입을 차단합니다.</p></div></div></div>
+      <div class="card b6"><div class="feat"><div class="ic">👨‍👩‍👧‍👦</div><div><h4>3. 가구 단위 3세대 회원 유입 & 다자녀 마케팅</h4>
+        <p>엄마↔아빠↔외할머니 간 육아 바통터치 기능을 활용해 가구 전체를 맘큐 회원으로 신규 유입(Customer Acquisition)시키며, 쌍둥이/다자녀 전용 대용량 특가 패키지를 운영합니다.</p></div></div></div>
+      <div class="card b6"><div class="feat"><div class="ic">🏥</div><div><h4>4. 비대면 소아과 제휴 & D2C 커스텀 굿즈</h4>
+        <p>38.2ºC 고열 체온 일지 및 AI 대변 분석 데이터를 맘큐 닥터 비대면 소아과 상담과 연동하고, 포토일기 데이터 기반 백일/돌맞이 맘큐 아크릴 포토액자 등 고마진 굿즈 커머스로 확장합니다.</p></div></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sechead"><div class="secno">5</div><h2>품질 및 보안 설계</h2>
+      <p>유한킴벌리 맘큐 서비스 표준 및 개인정보 보호 원칙을 준수합니다</p></div>
+    <div class="sec"><h4>🔒 민감·아기 개인 정보 보호 및 보안 원칙</h4>
+      <div class="secl">
+        <div>모든 육아 데이터 처리가 <b>사용자 브라우저 안에서 안전하게</b> 구동되도록 기본 설계</div>
+        <div>아이의 이름, 사진, 체온 등 민감 정보의 <b>외부 무단 유출 방지 및 안전 관리</b></div>
+        <div>맘큐 자사몰 회원 계정과 <b>보안 토큰 기반 정품 바코드 스캔 인증</b> 연동</div>
+        <div>정품 바코드 인증을 통해 <b>비정상적인 중복 쿠폰 수령 및 불법 수집 차단</b></div>
+        <div>외부 트래커나 불필요한 서드파티 분석 스크립트 미사용으로 <b>쾌적하고 안전한 UX</b></div>
+        <div>본 기획서 및 시연 앱의 데이터 구조는 <b>맘큐 D2C 서비스 표준에 부합</b></div>
+      </div></div>
+  </section>
+
+  <section>
+    <div class="sechead"><div class="secno">6</div><h2>확산 및 실행 로드맵</h2>
+      <p>실제 동작하는 웹앱이 준비되어 있어 즉시 시범 연동이 가능합니다</p></div>
+    <div class="road">
+      <div class="rd n1"><span class="p">완료</span><h4>1단계 · 서비스 구축 및 검증</h4>
+        <ul><li>영유아 CRM 웹앱 개발 완료 (babyapp_final.html)</li><li>수유·기저귀·체온(38.2ºC)/경고 한 줄 레이아웃 검증</li>
+          <li>쌍둥이/다둥이 우선 선택 팝업 UX 완료</li><li>단일 HTML 100% 작동 테스트 완료</li></ul></div>
+      <div class="rd n2"><span class="p">진행 가능</span><h4>2단계 · 맘큐 회원 시범 연동</h4>
+        <ul><li>맘큐 자사몰 회원 ID / 쿠폰 API 연동</li><li>하기스 기저귀 정품 바코드 DB 연동</li>
+          <li>맘큐 10%/15% 쿠폰 팝업 시범 테스트</li><li>사용자 피드백 기반 큐레이션 보강</li></ul></div>
+      <div class="rd n3"><span class="p">제안</span><h4>3단계 · 전사 커머스 표준화</h4>
+        <ul><li>맘큐 메인 서비스 공식 탭 연계 배포</li><li>그린핑거 / 앱솔루트 등 협력 브랜드 확대</li>
+          <li>맘큐 1초 정기구독(Subscription) 연동</li><li>아크릴 포토액자 굿즈 커머스 정식 런칭</li></ul></div>
+    </div>
+  </section>
+
+  <div class="foot">
+    <div class="l"><b style="color:var(--s700)">맘큐(MomQ) 연계 영유아 라이프사이클 CRM</b><br>
+      e-Platform 본부 · D2C 팀 · 맘큐 CRM 팀 · 2026.09</div>
+    <div class="r"><span class="badge">단일 HTML · 100% 동작</span><span class="badge">외부 의존성 0</span>
+      <span class="badge">서버·앱 설치 불필요</span><span class="badge">유한킴벌리 MomQ</span></div>
+  </div>
+</div></body></html>

@@ -1,11 +1,41 @@
-export type LogType = 'feeding' | 'formula' | 'breastfeeding' | 'diaper' | 'sleep' | 'bath' | 'medication' | 'temperature';
+export type LogType =
+  | 'feeding'
+  | 'formula'
+  | 'breastfeeding'
+  | 'diaper'
+  | 'sleep'
+  | 'bath'
+  | 'medication'
+  | 'temperature';
+
+export type LogCategoryFilter =
+  | 'all'
+  | 'formula'
+  | 'breastfeeding'
+  | 'diaper'
+  | 'sleep'
+  | 'bath'
+  | 'temperature';
 
 export type DiaperType = 'pee' | 'poop' | 'both';
 
-export type CaregiverType = '엄마' | '아빠' | '할머니' | '육아도우미';
+export interface BabyProfile {
+  id: string;
+  name: string;
+  birthDate: string;
+  babyDays: number;
+  gender: 'boy' | 'girl';
+  weight: string;
+  photoUrl: string;
+  diaperBrand: string;
+  formulaBrand: string;
+  isTwin?: boolean;
+  notes?: string;
+}
 
 export interface TimelineLog {
   id: string;
+  babyId?: string; // Links log to specific baby (useful for twins)
   type: LogType;
   time: string;
   title: string;
@@ -30,12 +60,6 @@ export interface FormulaInventory {
   couponClaimed: boolean;
 }
 
-export interface CoParentingStatus {
-  activeParent: CaregiverType;
-  elapsedText: string;
-  lastFeedingTime: string;
-}
-
 export interface TemperatureState {
   currentTemp: number;
   isHighFever: boolean; // >= 38.0
@@ -54,6 +78,7 @@ export interface NotificationItem {
 
 export interface PhotoDiaryItem {
   id: string;
+  babyId?: string; // Links photo diary to specific baby
   babyDays: number;
   date: string;
   imageUrl: string;
